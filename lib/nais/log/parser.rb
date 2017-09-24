@@ -23,7 +23,7 @@ module Nais
         end
       end
 
-      def Parser.remap_kubernetes_fields!(record)
+      def Parser.remap_kubernetes_fields(record)
         record["category"] = record.delete("stream") if record.has_key?("stream")
         record["container"] = record["docker"]["container_id"]
         record.delete("docker")
@@ -32,13 +32,15 @@ module Nais
         record["application"] = record["kubernetes"]["container_name"]
         record["pod"] = record["kubernetes"]["pod_name"]
         record.delete("kubernetes")
+        record
       end
 
-      def Parser.remap_java_fields!(record)
+      def Parser.remap_java_fields(record)
         record["thread"] = record.delete("thread_name") if record.has_key?("thread_name")
         record["component"] = record.delete("logger_name") if record.has_key?("logger_name")
         record["level"].capitalize! if record.has_key?("level")
         record.delete("level_value")
+        record
       end
 
       def Parser.prefix_nonstandard_fields(record)
