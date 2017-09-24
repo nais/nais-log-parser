@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ["Terje Sannum"]
   spec.email         = ["terje.sannum@nav.no"]
 
-  spec.summary       = %q{Fluentd plugin and functions for parsing logs}
+  spec.summary       = %q{Log parsing}
   spec.homepage      = "https://github.com/nais/nais-log-parser"
   spec.license       = "MIT"
 
