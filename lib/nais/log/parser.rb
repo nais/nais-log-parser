@@ -43,7 +43,7 @@ module Nais
         record["received_at"] = Time.new.iso8601(9)
         if !record.has_key?("@timestamp")
           record["@timestamp"] = record.delete("timestamp") if record.has_key?("timestamp")
-          record["@timestamp"] = time.iso8601(9) unless record.has_key?("@timestamp")
+          record["@timestamp"] = Time.at(time).iso8601(9) unless record.has_key?("@timestamp")
         end
         record["message"] = record.delete("log") unless record.has_key?("message")
         record
