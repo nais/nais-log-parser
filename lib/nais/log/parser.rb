@@ -39,6 +39,16 @@ module Nais
         record
       end
 
+      def Parser.remap_elasticsearch_fields(record)
+        record["received_at"] = Time.new.iso8601(9)
+        if !record.has_key?("@timestamp")
+          record["@timestamp"] = record.delete("timestamp") if record.has_key?("timestamp")
+          record["@timestamp"] = time.iso8601(9) unless record.has_key?("@timestamp")
+        end
+        record["message"] = new_record.delete("log") unless new_record.has_key?("message")
+        record
+      end
+
       def Parser.remap_java_fields(record)
         record["thread"] = record.delete("thread_name") if record.has_key?("thread_name")
         record["component"] = record.delete("logger_name") if record.has_key?("logger_name")
