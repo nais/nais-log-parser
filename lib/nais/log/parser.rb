@@ -25,13 +25,17 @@ module Nais
 
       def Parser.remap_kubernetes_fields(record)
         record["category"] = record.delete("stream") if record.has_key?("stream")
-        record["container"] = record["docker"]["container_id"]
-        record.delete("docker")
-        record["host"] = record["kubernetes"]["host"]
-        record["namespace"] = record["kubernetes"]["namespace_name"]
-        record["application"] = record["kubernetes"]["container_name"]
-        record["pod"] = record["kubernetes"]["pod_name"]
-        record.delete("kubernetes")
+        if record["docker"].is_a?(Hash)
+          record["container"] = record["docker"]["container_id"]
+          record.delete("docker")
+        end
+        if record["kubernetes"].is_a?(Hash)
+          record["host"] = record["kubernetes"]["host"]
+          record["namespace"] = record["kubernetes"]["namespace_name"]
+          record["application"] = record["kubernetes"]["container_name"]
+          record["pod"] = record["kubernetes"]["pod_name"]
+          record.delete("kubernetes")
+        end
         record
       end
 
