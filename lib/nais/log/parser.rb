@@ -88,7 +88,7 @@ module Nais
       end
 
       def Parser.parse_glog(str)
-        if m = str.match(/^([IWEF])(\d{4} \d\d:\d\d:\d\d.\d{6})\s+(\S+)\s([^:]+):(\d+)]\s+(.*)/)
+        if m = str.match(/^([IWEF])(\d{4} \d\d:\d\d:\d\d.\d{6})\s+(\S+)\s([^:]+):(\d+)\]\s+(.*)/)
           r = {}
           r['level'] = case m[1]
                        when 'I'
