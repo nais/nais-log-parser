@@ -36,8 +36,7 @@ RSpec.describe Nais::Log::Parser do
 
   it "does remap java fields" do
     r = {'thread_name'=>'thread_name','logger_name'=>'logger_name','level'=>'LEVEL','level_value'=>10000}
-    Nais::Log::Parser.remap_java_fields!(r)
-    expect(r).
+    expect(Nais::Log::Parser.remap_java_fields({'thread_name'=>'thread_name','logger_name'=>'logger_name','level'=>'LEVEL','level_value'=>10000})).
       to eql({'thread'=>'thread_name', 'component'=>'logger_name', 'level'=>'Level'})
   end
 
@@ -49,8 +48,7 @@ RSpec.describe Nais::Log::Parser do
                         'container_name'=>'container_name',
                         'pod_name'=>'pod_name',
                         'foo'=>'bar'}}
-    Nais::Log::Parser.remap_kubernetes_fields!(r)
-    expect(r).
+    expect(Nais::Log::Parser.remap_kubernetes_fields(r)).
       to eql({'application'=>'container_name',
               'category'=>'stdout',
               'container'=>'container_id',
