@@ -70,7 +70,7 @@ module Nais
         r
       end
 
-      def Parser.split_accesslog(str)
+      def Parser.parse_accesslog(str)
         if m = str.match(/^(\S+) +(?:(\S+) )?(\S+) \[([^\]]+)\] \"([^\"]*)\" (\S+) (\S+)(.*)/)
           r = {}
           r['remote_ip'] = m[1]
@@ -82,6 +82,30 @@ module Nais
           r['content_length'] = m[7] unless m[7] == '-'
           ext = m[8] unless m[8] == ''
           return r, ext
+        else
+          return nil
+        end
+      end
+
+      def Parser.parse_glog(str)
+        if m = str.match(/^([IWEF])(\d{4} \d\d:\d\d:\d\d.\d{6})\s+(\S+)\s([^:]+):(\d+)]\s+(.*)/)
+          r = {}
+          r['level'] = case m[1]
+                       when 'I'
+                         'Info'
+                       when 'W'
+                         'Warning'
+                       when 'E'
+                         'Error'
+                       when 'F'
+                         'Fatal'
+                       end
+          r['timestamp'] = Time.strptime(m[2], "%m%d %H:%M:%S.%N").iso8601(9)
+          r['thread'] = m[3]
+          r['file'] = m[4]
+          r['line'] = m[5]
+          r['message'] = m[6]
+          return r
         else
           return nil
         end
