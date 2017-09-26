@@ -1,4 +1,5 @@
 require "nais/log/parser/version"
+require "time"
 
 module Nais
   module Log
@@ -67,6 +68,23 @@ module Nais
           end
         }
         r
+      end
+
+      def Parser.split_accesslog(str)
+        if m = str.match(/^(\S+) +(\S+) (\S+) \[([^\]]+)\] \"([^\"]*)\" (\S+) (\S+)(.*)/)
+          r = {}
+          r['remote_ip'] = m[1]
+          r['ident'] = m[2] unless m[2] == '-'
+          r['user'] = m[3] unless m[3] == '-'
+          r['timestamp'] = Time.strptime(m[4], "%d/%b/%Y:%H:%M:%S %Z").iso8601
+          r['request'] = m[5]
+          r['response_code'] = m[6] unless m[6] == '-'
+          r['content_length'] = m[7] unless m[7] == '-'
+          ext = m[8] unless m[8] == ''
+          return r, ext
+        else
+          return nil
+        end
       end
       
     end

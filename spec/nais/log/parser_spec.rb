@@ -57,4 +57,31 @@ RSpec.describe Nais::Log::Parser do
               'pod'=>'pod_name'})
   end
 
+  it "does return nil on non-accesslog" do
+    expect(Nais::Log::Parser.split_accesslog('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does split ncsa accesslog" do
+    expect(Nais::Log::Parser.split_accesslog('127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326')).
+      to eql([{"remote_ip"=>"127.0.0.1",
+               "user"=>"frank",
+               "timestamp"=>"2000-10-10T13:55:36-07:00",
+               "request"=>"GET /apache_pb.gif HTTP/1.0",
+               "response_code"=>"200",
+               "content_length"=>"2326"},
+              nil])
+  end
+
+  it "does split accesslog with extended data" do
+    expect(Nais::Log::Parser.split_accesslog('127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 "http://www.example.com/start.html" "Mozilla/4.08 [en] (Win98; I ;Nav)"')).
+      to eql([{"remote_ip"=>"127.0.0.1",
+               "user"=>"frank",
+               "timestamp"=>"2000-10-10T13:55:36-07:00",
+               "request"=>"GET /apache_pb.gif HTTP/1.0",
+               "response_code"=>"200",
+               "content_length"=>"2326"},
+              " \"http://www.example.com/start.html\" \"Mozilla/4.08 [en] (Win98; I ;Nav)\""])
+  end
+  
 end
