@@ -43,10 +43,12 @@ module Nais
 
       def Parser.remap_elasticsearch_fields(time, record)
         record["received_at"] = Time.new.iso8601(9)
-        if !record.has_key?("@timestamp")
+        unless record.has_key?("@timestamp")
           record["@timestamp"] = record.delete("timestamp") || record.delete("time") || Time.at(time).iso8601(9)
         end
-        record["message"] = record.delete("log") unless record.has_key?("message")
+        unless record.has_key?("message")
+          record["message"] = record.delete("log") || record.delete("msg")
+        end
         record
       end
 
