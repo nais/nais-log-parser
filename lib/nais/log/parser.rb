@@ -1,3 +1,4 @@
+# coding: iso-8859-1
 require "nais/log/parser/version"
 require "time"
 
@@ -82,6 +83,16 @@ module Nais
           r['content_length'] = m[7] unless m[7] == '-'
           ext = m[8] unless m[8] == ''
           return r, ext
+        else
+          return nil
+        end
+      end
+
+      def Parser.parse_accesslog_with_processing_time(str)
+        p = Parser.parse_accesslog(str)
+        if !p.nil? && m = p[1].match(/^\s+([0-9.]+)(?:[µm]?s)?$/)
+          p[0]['processing_time'] = m[1]
+          return p[0]
         else
           return nil
         end
