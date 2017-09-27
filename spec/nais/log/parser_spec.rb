@@ -1,4 +1,4 @@
-# coding: iso-8859-1
+# coding: utf-8
 require "spec_helper"
 
 RSpec.describe Nais::Log::Parser do
@@ -96,13 +96,28 @@ RSpec.describe Nais::Log::Parser do
               " \"http://www.example.com/start.html\" \"Mozilla/4.08 [en] (Win98; I ;Nav)\""])
   end
 
-  it "does return nil on accesslog without processing time" do
+  it "does handle accesslog without processing time" do
     expect(Nais::Log::Parser.parse_accesslog_with_processing_time('127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326')).
-      to be nil
+      to eql({"remote_ip"=>"127.0.0.1",
+              "user"=>"frank",
+              "timestamp"=>"2000-10-10T13:55:36-07:00",
+              "request"=>"GET /apache_pb.gif HTTP/1.0",
+              "response_code"=>"200",
+              "content_length"=>"2326"})
+  end
+
+  it "does handle accesslog with - as processing time" do
+    expect(Nais::Log::Parser.parse_accesslog_with_processing_time('127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 -')).
+      to eql({"remote_ip"=>"127.0.0.1",
+              "user"=>"frank",
+              "timestamp"=>"2000-10-10T13:55:36-07:00",
+              "request"=>"GET /apache_pb.gif HTTP/1.0",
+              "response_code"=>"200",
+              "content_length"=>"2326"})
   end
 
   it "does parse accesslog with processing time" do
-    expect(Nais::Log::Parser.parse_accesslog_with_processing_time('127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 150.806µs')).
+    expect(Nais::Log::Parser.parse_accesslog_with_processing_time('127.0.0.1 - frank [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 150.806Âµs')).
       to eql({"remote_ip"=>"127.0.0.1",
               "user"=>"frank",
               "timestamp"=>"2000-10-10T13:55:36-07:00",
