@@ -62,7 +62,7 @@ module Nais
       def Parser.prefix_nonstandard_fields(record)
         r = {}
         record.each{|k,v|
-          if k =~ /^(?:@timestamp|@version|type|received_at|message|container|host|namespace|application|pod|thread|component|category|level|stack_trace|exception|cluster|envclass)$/
+          if k =~ /^(?:@timestamp|@version|type|received_at|message|container|host|namespace|application|pod|thread|component|category|level|stack_trace|exception|cluster|envclass|content_length|remote_ip|response_code|user|ident|processing_time)$/
             r[k] = record[k]
           else
             r["x_"+k] = record[k]
