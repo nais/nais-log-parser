@@ -89,10 +89,10 @@ module Nais
       end
 
       def Parser.parse_accesslog_with_processing_time(str)
-        p = Parser.parse_accesslog(str)
-        if !p.nil? && m = p[1].match(/^\s+([0-9.]+)(?:[µm]?s)?$/)
-          p[0]['processing_time'] = m[1]
-          return p[0]
+        r,ext = Parser.parse_accesslog(str)
+        if !ext.nil? && m = ext.match(/^\s+([0-9.]+)(?:[µm]?s)?$/)
+          r['processing_time'] = m[1]
+          return r
         else
           return nil
         end
