@@ -141,5 +141,30 @@ RSpec.describe Nais::Log::Parser do
               "thread" => "6",
               "timestamp" => Time.now.year.to_s+"-09-26T13:36:57.136153000+02:00"})
   end
+
+  it "does return nil on non-influxdb log" do
+    expect(Nais::Log::Parser.parse_influxdb('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does parse influxdb accesslog" do
+    expect(Nais::Log::Parser.parse_influxdb('[httpd] 192.168.100.0 - root [28/Sep/2017:09:23:05 +0000] "POST /write?consistency=&db=k8s&precision=&rp=default HTTP/1.1" 204 0 "-" "heapster/v1.4.2" a1fe620e-a42e-11e7-8083-000000000000 37327')).
+      to eql({"component"=>"httpd",
+              "remote_ip"=>"192.168.100.0",
+              "user"=>"root",
+              "timestamp"=>"2017-09-28T09:23:05+00:00",
+              "request"=>"POST /write?consistency=&db=k8s&precision=&rp=default HTTP/1.1",
+              "response_code"=>"204",
+              "content_length"=>"0",
+              "user_agent"=>"heapster/v1.4.2",
+              "request_id"=>"a1fe620e-a42e-11e7-8083-000000000000",
+              "processing_time"=>"37327"})
+  end
+
+  it "does parse influxdb non-accesslog" do
+    expect(Nais::Log::Parser.parse_influxdb('[tsm1] 2017/09/28 05:53:06 compacting level 2 group (0) /data/data/k8s/default/33/000000008-000000002.tsm (#1)')).
+      to eql({"component"=>"tsm1",
+              "timestamp"=>"2017-09-28T05:53:06+00:00"})
+  end
   
 end

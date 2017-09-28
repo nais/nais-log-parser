@@ -120,6 +120,31 @@ module Nais
           return nil
         end
       end
+
+      def Parser.parse_influxdb(str)
+        if m = str.match(/^\[([^\]]+)\] (.*)$/)
+          comp = m[1]
+          log = m[2]
+          r = {}
+          if comp == 'httpd'
+            r, ext = parse_accesslog(log)
+            if !r.nil? && !ext.nil? && m = ext.match(/^ \"([^\"]+)\" \"([^\"]+)\" ([0-9a-f-]+) (\d+)$/)
+              r['referer'] = m[1] unless m[1] == '-'
+              r['user_agent'] = m[2]  unless m[2] == '-'
+              r['request_id'] = m[3] unless m[3] == '-'
+              r['processing_time'] = m[4] unless m[4] == '-'
+            end
+          else
+            if m = log.match(/^(\d{4}\/\d\d\/\d\d \d\d:\d\d:\d\d) /)
+              r['timestamp'] = Time.strptime(m[1]+"+00:00", "%Y/%m/%d %H:%M:%S%Z").iso8601
+            end
+          end
+          r['component'] = comp
+          return r
+        else
+          return nil
+        end
+      end
       
     end
   end
