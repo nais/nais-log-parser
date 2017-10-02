@@ -60,6 +60,29 @@ module Nais
         record
       end
 
+      # remap fields from https://github.com/inconshreveable/log15/
+      def Parser.remap_log15(record)
+        record['@timestamp'] = record.delete('t') if record.has_key?('t')
+        record['message'] = record.delete('msg') if record.has_key?('msg')
+        record['component'] = record.delete('logger') if record.has_key?('logger')
+        if record.has_key?('lvl')
+          record['level'] = case record['lvl']
+                            when 'dbug'
+                              'Debug'
+                            when 'info'
+                              'Info'
+                            when 'warn'
+                              'Warning'
+                            when 'eror'
+                              'Error'
+                            when 'crit'
+                              'Critical'
+                            end
+          record.delete('lvl')
+        end
+        record
+      end
+        
       def Parser.prefix_nonstandard_fields(record)
         r = {}
         record.each{|k,v|
@@ -108,7 +131,7 @@ module Nais
                        when 'E'
                          'Error'
                        when 'F'
-                         'Fatal'
+                         'Critical'
                        end
           r['timestamp'] = Time.strptime(m[2], "%m%d %H:%M:%S.%N").iso8601(9)
           r['thread'] = m[3]

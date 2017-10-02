@@ -37,7 +37,7 @@ RSpec.describe Nais::Log::Parser do
 
   it "does remap java fields" do
     r = {'thread_name'=>'thread_name','logger_name'=>'logger_name','level'=>'LEVEL','level_value'=>10000}
-    expect(Nais::Log::Parser.remap_java_fields({'thread_name'=>'thread_name','logger_name'=>'logger_name','level'=>'LEVEL','level_value'=>10000})).
+    expect(Nais::Log::Parser.remap_java_fields(r)).
       to eql({'thread'=>'thread_name', 'component'=>'logger_name', 'level'=>'Level'})
   end
 
@@ -166,5 +166,11 @@ RSpec.describe Nais::Log::Parser do
       to eql({"component"=>"tsm1",
               "timestamp"=>"2017-09-28T05:53:06+00:00"})
   end
-  
+
+  it "does remap log15 fields" do
+    r = {'logger'=>'plugin','t'=>'2017-10-02T10:31:38.939550638Z','lvl'=>'dbug','msg'=>'foo bar'}
+    expect(Nais::Log::Parser.remap_log15(r)).
+      to eql({'component'=>'plugin', 'level'=>'Debug', 'message'=>'foo bar', '@timestamp'=>'2017-10-02T10:31:38.939550638Z'})
+  end
+
 end
