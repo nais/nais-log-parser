@@ -30,9 +30,9 @@ RSpec.describe Nais::Log::Parser do
       to eql(['BeanCreationException', 'IllegalStateException'])
   end
 
-  it "does prefix non standard fields" do
-    expect(Nais::Log::Parser.prefix_nonstandard_fields({'type'=>'standard', 'foo'=>'nonstandard'})).
-      to eql({'type'=>'standard', 'x_foo'=>'nonstandard'})
+  it "does prefix fields" do
+    expect(Nais::Log::Parser.prefix_fields({'a'=>'ok', 'b'=>'ok', 'c'=>'ok', 'aa'=>'prefix', 'ba'=>'prefix', 'foo'=>'prefix'}, 'x_', /^(?!(?:a$|b$|c$)).*/)).
+      to eql({'a'=>'ok', 'b'=>'ok', 'c'=>'ok', 'x_aa'=>'prefix', 'x_ba'=>'prefix', 'x_foo'=>'prefix'})
   end
 
   it "does remap java fields" do
