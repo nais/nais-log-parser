@@ -55,7 +55,10 @@ module Nais
       def Parser.remap_java_fields(record)
         record["thread"] = record.delete("thread_name") if record.has_key?("thread_name")
         record["component"] = record.delete("logger_name") if record.has_key?("logger_name")
-        record["level"].capitalize! if record.has_key?("level")
+        if record.has_key?("level")
+          record["level"].capitalize!
+          record['level'] = 'Warning' if record['level'] == 'Warn'
+        end
         record.delete("level_value")
         record
       end
