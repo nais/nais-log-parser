@@ -153,17 +153,19 @@ module Nais
           log = m[2]
           r = {}
           if comp == 'httpd'
-            r, ext = parse_accesslog(log)
-            if !r.nil? && !ext.nil? && m = ext.match(/^ \"([^\"]+)\" \"([^\"]+)\" ([0-9a-f-]+) (\d+)$/)
-              r['referer'] = m[1] unless m[1] == '-'
-              r['user_agent'] = m[2]  unless m[2] == '-'
-              r['request_id'] = m[3] unless m[3] == '-'
-              r['processing_time'] = m[4] unless m[4] == '-'
+            ar, ext = parse_accesslog(log)
+            unless ar.nil?
+              r = ar
+              if !ext.nil? && m = ext.match(/^ \"([^\"]+)\" \"([^\"]+)\" ([0-9a-f-]+) (\d+)$/)
+                r['referer'] = m[1] unless m[1] == '-'
+                r['user_agent'] = m[2]  unless m[2] == '-'
+                r['request_id'] = m[3] unless m[3] == '-'
+                r['processing_time'] = m[4] unless m[4] == '-'
+              end
             end
-          else
-            if m = log.match(/^(\d{4}\/\d\d\/\d\d \d\d:\d\d:\d\d) /)
-              r['timestamp'] = Time.strptime(m[1]+"+00:00", "%Y/%m/%d %H:%M:%S%Z").iso8601
-            end
+          end
+          if m = log.match(/^(\d{4}\/\d\d\/\d\d \d\d:\d\d:\d\d) /)
+            r['timestamp'] = Time.strptime(m[1]+"+00:00", "%Y/%m/%d %H:%M:%S%Z").iso8601
           end
           r['component'] = comp
           return r

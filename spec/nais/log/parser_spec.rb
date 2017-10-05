@@ -152,6 +152,16 @@ RSpec.describe Nais::Log::Parser do
       to be nil
   end
 
+  it "does handle non-accesslog from influxdb httpd log" do
+    expect(Nais::Log::Parser.parse_influxdb('[httpd] Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to eql({"component"=>"httpd"})
+  end
+
+  it "does handle non-accesslog with timestamp from influxdb httpd log" do
+    expect(Nais::Log::Parser.parse_influxdb('[httpd] 2017/10/05 13:08:11 Starting HTTP service')).
+      to eql({"component"=>"httpd", "timestamp"=>"2017-10-05T13:08:11+00:00"})
+  end
+
   it "does parse influxdb accesslog" do
     expect(Nais::Log::Parser.parse_influxdb('[httpd] 192.168.100.0 - root [28/Sep/2017:09:23:05 +0000] "POST /write?consistency=&db=k8s&precision=&rp=default HTTP/1.1" 204 0 "-" "heapster/v1.4.2" a1fe620e-a42e-11e7-8083-000000000000 37327')).
       to eql({"component"=>"httpd",
