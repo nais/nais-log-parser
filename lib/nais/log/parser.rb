@@ -86,10 +86,10 @@ module Nais
         record
       end
         
-      def Parser.prefix_fields(record, prefix, regex)
+      def Parser.prefix_fields(record, prefix, regex, negate = false)
         r = {}
         record.each{|k,v|
-          if k =~ regex
+          if (!negate && k =~ regex) || (negate && k !~ regex)
             r[prefix+k] = record[k]
           else
             r[k] = record[k]

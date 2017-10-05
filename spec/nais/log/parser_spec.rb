@@ -35,6 +35,11 @@ RSpec.describe Nais::Log::Parser do
       to eql({'a'=>'ok', 'b'=>'ok', 'c'=>'ok', 'x_aa'=>'prefix', 'x_ba'=>'prefix', 'x_foo'=>'prefix'})
   end
 
+  it "does prefix fields with negated regex" do
+    expect(Nais::Log::Parser.prefix_fields({'a'=>'ok', 'b'=>'ok', 'c'=>'ok', 'aa'=>'prefix', 'ba'=>'prefix', 'foo'=>'prefix'}, 'x_', /^(a|b|c)$/, true)).
+      to eql({'a'=>'ok', 'b'=>'ok', 'c'=>'ok', 'x_aa'=>'prefix', 'x_ba'=>'prefix', 'x_foo'=>'prefix'})
+  end
+
   it "does remap java fields" do
     r = {'thread_name'=>'thread_name','logger_name'=>'logger_name','level'=>'LEVEL','level_value'=>10000}
     expect(Nais::Log::Parser.remap_java_fields(r)).
