@@ -172,7 +172,7 @@ module Nais
         end
       end
 
-      def loglevel_from_dns_response(response)
+      def Parser.loglevel_from_dns_response(response)
         return case response
                when 'NOERROR'
                  'Info'
@@ -191,7 +191,7 @@ module Nais
                end
       end
 
-      def loglevel_from_http_response(response)
+      def Parser.loglevel_from_http_response(response)
         return case response.to_s[0,1]
                when '2','3'
                  'Info'
