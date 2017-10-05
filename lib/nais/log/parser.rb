@@ -171,7 +171,37 @@ module Nais
           return nil
         end
       end
-      
+
+      def loglevel_from_dns_response(response)
+        return case response
+               when 'NOERROR'
+                 'Info'
+               when 'NODATA'
+                 'Warning'
+               when 'FORMERR'
+                 'Warning'
+               when 'SERVFAIL'
+                 'Error'
+               when 'NXDOMAIN'
+                 'Warning'
+               when 'NOTIMP'
+                 'Warning'
+               when 'REFUSED'
+                 'Warning'
+               end
+      end
+
+      def loglevel_from_http_response(response)
+        return case response.to_s[0,1]
+               when '2','3'
+                 'Info'
+               when '4'
+                 'Warning'
+               when '5'
+                 'Error'
+               end
+      end
+
     end
   end
 end
