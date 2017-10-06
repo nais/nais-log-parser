@@ -154,12 +154,12 @@ RSpec.describe Nais::Log::Parser do
 
   it "does handle non-accesslog from influxdb httpd log" do
     expect(Nais::Log::Parser.parse_influxdb('[httpd] Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
-      to eql({"component"=>"httpd"})
+      to eql({'component'=>'httpd', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit.'})
   end
 
   it "does handle non-accesslog with timestamp from influxdb httpd log" do
     expect(Nais::Log::Parser.parse_influxdb('[httpd] 2017/10/05 13:08:11 Starting HTTP service')).
-      to eql({"component"=>"httpd", "timestamp"=>"2017-10-05T13:08:11+00:00"})
+      to eql({'component'=>'httpd', 'timestamp'=>'2017-10-05T13:08:11+00:00', 'message'=>'Starting HTTP service'})
   end
 
   it "does parse influxdb accesslog" do
@@ -168,18 +168,19 @@ RSpec.describe Nais::Log::Parser do
               "remote_ip"=>"192.168.100.0",
               "user"=>"root",
               "timestamp"=>"2017-09-28T09:23:05+00:00",
-              "request"=>"POST /write?consistency=&db=k8s&precision=&rp=default HTTP/1.1",
+              "message"=>"POST /write?consistency=&db=k8s&precision=&rp=default HTTP/1.1",
               "response_code"=>"204",
               "content_length"=>"0",
               "user_agent"=>"heapster/v1.4.2",
-              "request_id"=>"a1fe620e-a42e-11e7-8083-000000000000",
+              "request"=>"a1fe620e-a42e-11e7-8083-000000000000",
               "processing_time"=>"37327"})
   end
 
   it "does parse influxdb non-accesslog" do
     expect(Nais::Log::Parser.parse_influxdb('[tsm1] 2017/09/28 05:53:06 compacting level 2 group (0) /data/data/k8s/default/33/000000008-000000002.tsm (#1)')).
       to eql({"component"=>"tsm1",
-              "timestamp"=>"2017-09-28T05:53:06+00:00"})
+              "timestamp"=>"2017-09-28T05:53:06+00:00",
+              'message'=>'compacting level 2 group (0) /data/data/k8s/default/33/000000008-000000002.tsm (#1)'})
   end
 
   it "does remap log15 fields" do

@@ -149,25 +149,29 @@ module Nais
 
       def Parser.parse_influxdb(str)
         if m = str.match(/^\[([^\]]+)\] (.*)$/)
-          comp = m[1]
-          log = m[2]
           r = {}
+          comp = m[1]
+          msg = m[2]
           if comp == 'httpd'
-            ar, ext = parse_accesslog(log)
+            ar, ext = parse_accesslog(msg)
             unless ar.nil?
               r = ar
+              r['message'] = r.delete('request')
               if !ext.nil? && m = ext.match(/^ \"([^\"]+)\" \"([^\"]+)\" ([0-9a-f-]+) (\d+)$/)
                 r['referer'] = m[1] unless m[1] == '-'
                 r['user_agent'] = m[2]  unless m[2] == '-'
-                r['request_id'] = m[3] unless m[3] == '-'
+                r['request'] = m[3] unless m[3] == '-'
                 r['processing_time'] = m[4] unless m[4] == '-'
               end
             end
           end
-          if m = log.match(/^(\d{4}\/\d\d\/\d\d \d\d:\d\d:\d\d) /)
-            r['timestamp'] = Time.strptime(m[1]+"+00:00", "%Y/%m/%d %H:%M:%S%Z").iso8601
-          end
           r['component'] = comp
+          if m = msg.match(/^(\d{4}\/\d\d\/\d\d \d\d:\d\d:\d\d) (.*)/)
+            r['timestamp'] = Time.strptime(m[1]+"+00:00", "%Y/%m/%d %H:%M:%S%Z").iso8601
+            r['message'] = m[2]
+          elsif r['message'].nil?
+            r['message'] = msg
+          end
           return r
         else
           return nil
