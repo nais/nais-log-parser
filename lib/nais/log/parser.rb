@@ -165,10 +165,21 @@ module Nais
               end
             end
           end
-          r['component'] = comp
-          if m = msg.match(/^(\d{4}\/\d\d\/\d\d \d\d:\d\d:\d\d) (.*)/)
-            r['timestamp'] = Time.strptime(m[1]+"+00:00", "%Y/%m/%d %H:%M:%S%Z").iso8601
-            r['message'] = m[2]
+          case comp
+          when 'D'
+            r['level'] = 'Debug'
+          when 'I'
+            r['level'] = 'Info'
+          when 'W'
+            r['level'] = 'Warning'
+          when 'E'
+            r['level'] = 'Error'
+          else
+            r['component'] = comp
+          end
+          if m = msg.match(/^(\d{4}[-\/]\d\d[-\/]\d\d)[ T](\d\d:\d\d:\d\d)Z? (.*)/)
+            r['timestamp'] = Time.strptime(m[1].tr('/','-')+" "+m[2]+"+00:00", "%Y-%m-%d %H:%M:%S%Z").iso8601
+            r['message'] = m[3]
           elsif r['message'].nil?
             r['message'] = msg
           end

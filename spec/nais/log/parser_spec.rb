@@ -162,6 +162,11 @@ RSpec.describe Nais::Log::Parser do
       to eql({'component'=>'httpd', 'timestamp'=>'2017-10-05T13:08:11+00:00', 'message'=>'Starting HTTP service'})
   end
 
+  it "does parse loglevel and timestamp from influxdb log" do
+    expect(Nais::Log::Parser.parse_influxdb('[I] 2017-10-05T13:08:11Z retention policy shard deletion check commencing service=retention')).
+      to eql({'level'=>'Info', 'timestamp'=>'2017-10-05T13:08:11+00:00', 'message'=>'retention policy shard deletion check commencing service=retention'})
+  end
+
   it "does parse influxdb accesslog" do
     expect(Nais::Log::Parser.parse_influxdb('[httpd] 192.168.100.0 - root [28/Sep/2017:09:23:05 +0000] "POST /write?consistency=&db=k8s&precision=&rp=default HTTP/1.1" 204 0 "-" "heapster/v1.4.2" a1fe620e-a42e-11e7-8083-000000000000 37327')).
       to eql({"component"=>"httpd",
