@@ -17,11 +17,11 @@ module Nais
         end
       end
 
-      def Parser.get_exceptions(str)
-        exps = str.scan(/\b[A-Z]\w+Exception\b/)
-        if exps.any?
-          exps.uniq!
-          exps.size == 1 ? exps.first : exps
+      def Parser.get_keywords(str, regex)
+        keywords = str.scan(regex)
+        if keywords.any?
+          keywords.uniq!
+          keywords.size == 1 ? keywords.first : keywords
         end
       end
 

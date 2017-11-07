@@ -12,22 +12,28 @@ RSpec.describe Nais::Log::Parser do
   end
 
   it "does not find exception" do
-    expect(Nais::Log::Parser.get_exceptions('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+    expect(Nais::Log::Parser.get_keywords('Lorem ipsum dolor sit amet, consectetur adipiscing elit.', /\b[A-Z]\w+Exception\b/)).
       to be nil
   end
 
   it "does find single exception" do
-    expect(Nais::Log::Parser.get_exceptions('Exception in thread "main" java.util.NoSuchElementException: foo bar')).
+    expect(Nais::Log::Parser.get_keywords('Exception in thread "main" java.util.NoSuchElementException: foo bar', /\b[A-Z]\w+Exception\b/)).
       to eql('NoSuchElementException')
   end
+
   it "does remove duplicate exception" do
-    expect(Nais::Log::Parser.get_exceptions('Exception in thread "main" java.util.NoSuchElementException: NoSuchElementException')).
+    expect(Nais::Log::Parser.get_keywords('Exception in thread "main" java.util.NoSuchElementException: NoSuchElementException', /\b[A-Z]\w+Exception\b/)).
       to eql('NoSuchElementException')
   end
 
   it "does find multiple exceptions" do
-    expect(Nais::Log::Parser.get_exceptions("org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration: Invocation of init method failed; nested exception is java.lang.IllegalStateException: Ambiguous mapping found. Cannot map 'appController' bean method")).
+    expect(Nais::Log::Parser.get_keywords("org.springframework.beans.factory.BeanCreationException: Error creating bean with name 'requestMappingHandlerMapping' defined in class org.springframework.web.servlet.config.annotation.DelegatingWebMvcConfiguration: Invocation of init method failed; nested exception is java.lang.IllegalStateException: Ambiguous mapping found. Cannot map 'appController' bean method", /\b[A-Z]\w+Exception\b/)).
       to eql(['BeanCreationException', 'IllegalStateException'])
+  end
+
+  it "does find oracle error code" do
+    expect(Nais::Log::Parser.get_keywords('org.hibernate.engine.jdbc.spi.SqlExceptionHelper ORA-00001: unique constraint (FOO.BAR) violated', /\bORA-\d{5}\b/)).
+      to eql('ORA-00001')
   end
 
   it "does prefix fields" do

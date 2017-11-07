@@ -1,7 +1,7 @@
 module Nais
   module Log
     module Parser
-      VERSION = "0.14.1"
+      VERSION = "0.15.0"
     end
   end
 end
