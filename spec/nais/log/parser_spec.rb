@@ -52,6 +52,36 @@ RSpec.describe Nais::Log::Parser do
       to eql({'thread'=>'thread_name', 'component'=>'logger_name', 'level'=>'Level'})
   end
 
+  it "does remap log4j2 logs" do
+    r = { "exception" => { "exception_class" => "java.lang.InterruptedException",
+                           "exception_message" => "foobar",
+                           "stacktrace" => "java.lang.InterruptedException: foobar\n\tat LoggerTest.rndException(LoggerTest.java:35)\n\tat LoggerTest.main(LoggerTest.java:20)\n"
+                         },
+          "mdc" => {
+            "mdc1" => "val1",
+            "mdc2" => "val2",
+          },
+          "@version" => 1,
+          "source_host" => "04bd2b402f37",
+          "message" => "gwfuwgqeotszxojcywbohrxdaghw",
+          "thread_name" => "main",
+          "@timestamp" => "2017-11-13T09:47:52.370+00:00",
+          "level" => "ERROR",
+          "logger_name" => "LoggerTest"
+        }
+    expect(Nais::Log::Parser.remap_java_fields(r)).
+      to eql({"@timestamp" => "2017-11-13T09:47:52.370+00:00",
+              "@version" => 1,
+              "message" => "gwfuwgqeotszxojcywbohrxdaghw",
+              "level" => "Error",
+              "component" => "LoggerTest",
+              "thread" => "main",
+              "stack_trace" => "java.lang.InterruptedException: foobar\n\tat LoggerTest.rndException(LoggerTest.java:35)\n\tat LoggerTest.main(LoggerTest.java:20)\n",
+              "mdc1" => "val1",
+              "mdc2" => "val2"
+             });
+  end
+
   it "does remap kubernetes fields" do
     r = {'stream'=>'stdout',
          'docker'=>{'container_id'=>'container_id','foo'=>'bar'},

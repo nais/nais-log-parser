@@ -60,6 +60,18 @@ module Nais
           record['level'] = 'Warning' if record['level'] == 'Warn'
         end
         record.delete("level_value")
+        record.delete("ndc")
+        record.delete("source_host")
+        if record.has_key?('exception')
+          record['stack_trace'] = record['exception']['stacktrace'] if record['exception'].has_key?('stacktrace')
+          record.delete('exception')
+        end
+        if record.has_key?('mdc')
+          record['mdc'].each{|k,v|
+            record[k] = record['mdc'][k]
+          }
+          record.delete('mdc')
+        end
         record
       end
 
