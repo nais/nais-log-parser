@@ -135,6 +135,15 @@ module Nais
         return r
       end
 
+      def Parser.parse_accesslog_with_referer_useragent(str)
+        r,ext = Parser.parse_accesslog(str)
+        if !ext.nil? && m = ext.match(/^\s+\"([^\"]+)\" \"([^\"]+)\"$/)
+          r['referer'] = m[1] unless m[1] == '-'
+          r['user_agent'] = m[2] unless m[2] == '-'
+        end
+        return r
+      end
+
       def Parser.parse_glog(str)
         if m = str.match(/^([IWEF])(\d{4} \d\d:\d\d:\d\d.\d{6})\s+(\S+)\s([^:]+):(\d+)\]\s+(.*)/)
           r = {}
