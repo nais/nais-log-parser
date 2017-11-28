@@ -145,7 +145,7 @@ module Nais
       end
 
       def Parser.parse_glog(str)
-        if m = str.match(/^([IWEF])(\d{4} \d\d:\d\d:\d\d.\d{6})\s+(\S+)\s([^:]+):(\d+)\]\s+(.*)/)
+        if m = str.match(/^([IWEF])(\d{4} \d\d:\d\d:\d\d\.\d{6})\s+(\S+)\s([^:]+):(\d+)\]\s+(.*)/)
           r = {}
           r['level'] = case m[1]
                        when 'I'
@@ -162,6 +162,35 @@ module Nais
           r['file'] = m[4]
           r['line'] = m[5]
           r['message'] = m[6]
+          return r
+        else
+          return nil
+        end
+      end
+
+      # https://github.com/coreos/pkg/tree/master/capnslog
+      def Parser.parse_capnslog(str)
+        if m = str.match(/^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{6}) ([TDNIWEC]) \| ([^:]+):\s*(.*)/)
+          r = {}
+          r['timestamp'] = Time.strptime(m[1], "%Y-%m-%d %H:%M:%S.%N").iso8601(9)
+          r['level'] = case m[2]
+                       when 'T'
+                         'Trace'
+                       when 'D'
+                         'Debug'
+                       when 'N'
+                         'Notice'
+                       when 'I'
+                         'Info'
+                       when 'W'
+                         'Warning'
+                       when 'E'
+                         'Error'
+                       when 'C'
+                         'Critical'
+                       end
+          r['component'] = m[3]
+          r['message'] = m[4]
           return r
         else
           return nil

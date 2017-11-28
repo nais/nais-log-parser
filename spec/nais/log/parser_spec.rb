@@ -216,6 +216,19 @@ RSpec.describe Nais::Log::Parser do
               "timestamp" => Time.now.year.to_s+"-09-26T13:36:57.136153000+02:00"})
   end
 
+  it "does return nil on capnslog" do
+    expect(Nais::Log::Parser.parse_capnslog('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does parse capnslog" do
+    expect(Nais::Log::Parser.parse_capnslog('2017-11-22 17:06:45.734626 I | op-k8sutil: cluster role rook-agent already exists. Updating if needed.')).
+      to eql({"level" => "Info",
+              "component" => "op-k8sutil",
+              "message" => "cluster role rook-agent already exists. Updating if needed.",
+              "timestamp" => "2017-11-22T17:06:45.734626000+01:00"})
+  end
+
   it "does return nil on non-influxdb log" do
     expect(Nais::Log::Parser.parse_influxdb('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
       to be nil
