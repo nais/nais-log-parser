@@ -47,8 +47,9 @@ module Nais
           record["@timestamp"] = record.delete("timestamp") || record.delete("time") || Time.at(time).iso8601(9)
         end
         unless record.has_key?("message")
-          record["message"] = record.delete("log") || record.delete("msg")
+          record["message"] = record.delete("msg") || record.delete("log")
         end
+        record.delete('log')
         record
       end
 
