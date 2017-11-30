@@ -46,6 +46,21 @@ RSpec.describe Nais::Log::Parser do
       to eql({'a'=>'ok', 'b'=>'ok', 'c'=>'ok', 'x_aa'=>'prefix', 'x_ba'=>'prefix', 'x_foo'=>'prefix'})
   end
 
+  it "doesn't find any kv pairs" do
+    expect(Nais::Log::Parser.parse_kv("foo bar= zot=")).
+      to be nil
+  end
+
+  it "does drop long key match in kv pairs" do
+    expect(Nais::Log::Parser.parse_kv("foofoofoofoofoofoofoofoofoofoofoo=bar")).
+      to be nil
+  end
+
+  it "does find kv pairs" do
+    expect(Nais::Log::Parser.parse_kv('Lorem ipsum dolor sit amet, consectetur adipiscing elit. foo=bar, zot="hello world" empty=""')).
+      to eql({'foo'=>'bar', 'zot'=>'hello world'})
+  end
+
   it "does remap java fields" do
     r = {'thread_name'=>'thread_name','logger_name'=>'logger_name','level'=>'LEVEL','level_value'=>10000}
     expect(Nais::Log::Parser.remap_java_fields(r)).

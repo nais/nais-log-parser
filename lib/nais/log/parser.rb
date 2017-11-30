@@ -110,6 +110,16 @@ module Nais
         r
       end
 
+      def Parser.parse_kv(str)
+        r = {}
+        if match = str.scan(/\b([A-Za-z]{1,20})=(?:([^\ "][^, ]*)|\"([^\"]+)\"),?/)
+          match.each{|m|
+            r[m[0]] = m[1].nil? ? m[2] : m[1]
+          }
+        end
+        return r.empty? ? nil : r
+      end
+
       def Parser.parse_accesslog(str)
         if m = str.match(/^(\S+) +(?:(\S+) )?(\S+) \[([^\]]+)\] \"([^\"]*)\" (\S+) (\S+)(.*)/)
           r = {}
