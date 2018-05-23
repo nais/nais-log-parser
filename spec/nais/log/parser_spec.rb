@@ -291,4 +291,28 @@ RSpec.describe Nais::Log::Parser do
       to eql({'component'=>'plugin', 'level'=>'Debug', 'message'=>'foo bar', '@timestamp'=>'2017-10-02T10:31:38.939550638Z'})
   end
 
+  it "does nothing when missing json field" do
+    r = {'log'=>"{\"message\":\"test\",\"foo\":\"bar\"}\n",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
+    expect(Nais::Log::Parser.merge_json_field(r, 'missing')).
+      to be nil
+  end
+
+  it "does nothing on json parse error" do
+    r = {'log'=>"{\"message\":\"test\",\"foo\"=\"bar\"}\n",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
+    expect(Nais::Log::Parser.merge_json_field(r, 'log')).
+      to be nil
+  end
+
+  it "does nothing on non-json field" do
+    r = {'log'=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
+    expect(Nais::Log::Parser.merge_json_field(r, 'log')).
+      to be nil
+  end
+
+  it "does merge json" do
+    r = {'log'=>"{\"message\":\"test\",\"foo\":\"bar\"}\n",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
+    expect(Nais::Log::Parser.merge_json_field(r, 'log')).
+      to eql({'stream'=>'stdout', 'foo'=>'bar', 'message'=>'test', 'time'=>'2018-05-23T07:56:09.330928186Z'})
+  end
+
 end

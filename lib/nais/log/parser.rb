@@ -1,6 +1,7 @@
 # coding: utf-8
 require "nais/log/parser/version"
 require "time"
+require "json"
 
 module Nais
   module Log
@@ -39,6 +40,23 @@ module Nais
           record.delete("kubernetes")
         end
         record
+      end
+
+      def Parser.merge_json_field(record, field)
+        if record.has_key?(field)
+          value = record[field].strip
+          if value[0].eql?('{') && value[-1].eql?('}')
+            begin
+              record = JSON.parse(value).merge(record)
+              record.delete(field)
+              record
+            rescue JSON::ParserError=>e
+              nil
+            end
+          end
+        else
+          nil
+        end
       end
 
       def Parser.remap_elasticsearch_fields(time, record)
