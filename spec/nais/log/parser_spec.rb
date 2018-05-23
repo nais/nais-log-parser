@@ -293,20 +293,17 @@ RSpec.describe Nais::Log::Parser do
 
   it "does nothing when missing json field" do
     r = {'log'=>"{\"message\":\"test\",\"foo\":\"bar\"}\n",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
-    expect(Nais::Log::Parser.merge_json_field(r, 'missing')).
-      to be nil
+    expect(Nais::Log::Parser.merge_json_field(r, 'missing')).to eql(r)
   end
 
   it "does nothing on json parse error" do
     r = {'log'=>"{\"message\":\"test\",\"foo\"=\"bar\"}\n",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
-    expect(Nais::Log::Parser.merge_json_field(r, 'log')).
-      to be nil
+    expect(Nais::Log::Parser.merge_json_field(r, 'log')).to eql(r)
   end
 
   it "does nothing on non-json field" do
     r = {'log'=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
-    expect(Nais::Log::Parser.merge_json_field(r, 'log')).
-      to be nil
+    expect(Nais::Log::Parser.merge_json_field(r, 'log')).to eql(r)
   end
 
   it "does merge json" do

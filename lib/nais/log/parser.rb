@@ -49,14 +49,11 @@ module Nais
             begin
               record = JSON.parse(value).merge(record)
               record.delete(field)
-              record
             rescue JSON::ParserError=>e
-              nil
             end
           end
-        else
-          nil
         end
+        record
       end
 
       def Parser.remap_elasticsearch_fields(time, record)
