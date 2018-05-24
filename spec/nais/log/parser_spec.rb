@@ -231,7 +231,7 @@ RSpec.describe Nais::Log::Parser do
               "timestamp" => Time.now.year.to_s+"-09-26T13:36:57.136153000+02:00"})
   end
 
-  it "does return nil on capnslog" do
+  it "does return nil on non-capnslog" do
     expect(Nais::Log::Parser.parse_capnslog('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
       to be nil
   end
@@ -310,6 +310,27 @@ RSpec.describe Nais::Log::Parser do
     r = {'log'=>"{\"message\":\"test\",\"foo\":\"bar\"}\n",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
     expect(Nais::Log::Parser.merge_json_field(r, 'log')).
       to eql({'stream'=>'stdout', 'foo'=>'bar', 'message'=>'test', 'time'=>'2018-05-23T07:56:09.330928186Z'})
+  end
+
+  it "does return nil on non logrus" do
+    expect(Nais::Log::Parser.parse_logrus('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does return nil on valid logfmt but non logrus" do
+    expect(Nais::Log::Parser.parse_logrus('foo=bar a=14 baz="hello kitty"')).
+      to be nil
+  end
+
+  it "does parse logrus" do
+    expect(Nais::Log::Parser.parse_logrus('time="2018-05-24T07:11:18Z" level=info msg="deployment updated" deployment=rfs-dpl namespace=x8 service=k8s.deployment src="deployment.go:77"')).
+      to eql({"time" => "2018-05-24T07:11:18Z",
+              "level" => "info",
+              "msg" => "deployment updated",
+              "deployment" => "rfs-dpl",
+              "namespace" => "x8",
+              "service" => "k8s.deployment",
+              "src" => "deployment.go:77"})
   end
 
 end

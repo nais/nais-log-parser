@@ -2,6 +2,7 @@
 require "nais/log/parser/version"
 require "time"
 require "json"
+require "logfmt"
 
 module Nais
   module Log
@@ -168,6 +169,15 @@ module Nais
           r['user_agent'] = m[2] unless m[2] == '-'
         end
         return r
+      end
+
+      def Parser.parse_logrus(str)
+        r = Logfmt.parse(str)
+        if !r.nil? && r.has_key?('time') && r.has_key?('level') && r.has_key?('msg')
+          r
+        else
+          nil
+        end
       end
 
       def Parser.parse_glog(str)
