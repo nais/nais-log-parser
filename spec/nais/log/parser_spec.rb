@@ -333,4 +333,26 @@ RSpec.describe Nais::Log::Parser do
               "src" => "deployment.go:77"})
   end
 
+  it "does return nil on non go-kit" do
+    expect(Nais::Log::Parser.parse_gokit('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does return nil on valid logfmt but non go-kit" do
+    expect(Nais::Log::Parser.parse_gokit('foo=bar a=14 baz="hello kitty"')).
+      to be nil
+  end
+
+  it "does parse go-kit" do
+    expect(Nais::Log::Parser.parse_gokit('level=warn ts=2018-05-31T12:04:08.86715797Z caller=scrape.go:697 component="scrape manager" scrape_pool=kubernetes-pods target=http://192.168.60.30:8080/foobar/internal/metric msg="append failed" err="no token found"')).
+      to eql({"ts" => "2018-05-31T12:04:08.86715797Z",
+              "level" => "warn",
+              "msg" => "append failed",
+              "caller" => "scrape.go:697",
+              "component" => "scrape manager",
+              "scrape_pool" => "kubernetes-pods",
+              "target" => "http://192.168.60.30:8080/foobar/internal/metric",
+              "err" => "no token found"})
+  end
+
 end

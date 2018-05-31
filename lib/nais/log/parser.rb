@@ -60,7 +60,7 @@ module Nais
       def Parser.remap_elasticsearch_fields(time, record)
         record["received_at"] = Time.new.iso8601(9)
         unless record.has_key?("@timestamp")
-          record["@timestamp"] = record.delete("timestamp") || record.delete("time") || Time.at(time).iso8601(9)
+          record["@timestamp"] = record.delete("timestamp") || record.delete("time") || record.delete("ts") || Time.at(time).iso8601(9)
         end
         unless record.has_key?("message")
           record["message"] = record.delete("msg") || record.delete("log")
@@ -174,6 +174,15 @@ module Nais
       def Parser.parse_logrus(str)
         r = Logfmt.parse(str)
         if !r.nil? && r.has_key?('time') && r.has_key?('level') && r.has_key?('msg')
+          r
+        else
+          nil
+        end
+      end
+
+      def Parser.parse_gokit(str)
+        r = Logfmt.parse(str)
+        if !r.nil? && r.has_key?('ts') && r.has_key?('level') && r.has_key?('msg')
           r
         else
           nil
