@@ -129,7 +129,7 @@ module Nais
 
       def Parser.parse_kv(str)
         r = {}
-        if match = str.scan(/\b([A-Za-z]{1,20})=(?:([^\ "][^, ]*)|\"([^\"]+)\"),?/)
+        if !str.nil? && match = str.scan(/\b([A-Za-z]{1,20})=(?:([^\ "][^, ]*)|\"([^\"]+)\"),?/)
           match.each{|m|
             r[m[0]] = m[1].nil? ? m[2] : m[1]
           }
@@ -138,7 +138,7 @@ module Nais
       end
 
       def Parser.parse_accesslog(str)
-        if m = str.match(/^(\S+) +(?:(\S+) )?(\S+) \[([^\]]+)\] \"([^\"]*)\" (\S+) (\S+)(.*)/)
+        if !str.nil? && m = str.match(/^(\S+) +(?:(\S+) )?(\S+) \[([^\]]+)\] \"([^\"]*)\" (\S+) (\S+)(.*)/)
           r = {}
           r['remote_ip'] = m[1]
           r['ident'] = m[2] unless (m[2].nil? || m[2] == '-')
@@ -190,7 +190,7 @@ module Nais
       end
 
       def Parser.parse_glog(str)
-        if m = str.match(/^([IWEF])(\d{4} \d\d:\d\d:\d\d\.\d{6})\s+(\S+)\s([^:]+):(\d+)\]\s+(.*)/)
+        if !str.nil? && m = str.match(/^([IWEF])(\d{4} \d\d:\d\d:\d\d\.\d{6})\s+(\S+)\s([^:]+):(\d+)\]\s+(.*)/)
           r = {}
           r['level'] = case m[1]
                        when 'I'
@@ -215,7 +215,7 @@ module Nais
 
       # https://github.com/coreos/pkg/tree/master/capnslog
       def Parser.parse_capnslog(str)
-        if m = str.match(/^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{6}) ([TDNIWEC]) \| ([^:]+):\s*(.*)/)
+        if !str.nil? && m = str.match(/^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{6}) ([TDNIWEC]) \| ([^:]+):\s*(.*)/)
           r = {}
           r['timestamp'] = Time.strptime(m[1], "%Y-%m-%d %H:%M:%S.%N").iso8601(9)
           r['level'] = case m[2]
@@ -243,7 +243,7 @@ module Nais
       end
 
       def Parser.parse_influxdb(str)
-        if m = str.match(/^\[([^\]]+)\] (.*)$/)
+        if !str.nil? && m = str.match(/^\[([^\]]+)\] (.*)$/)
           r = {}
           comp = m[1]
           msg = m[2]
