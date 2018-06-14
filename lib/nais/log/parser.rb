@@ -9,13 +9,17 @@ module Nais
   module Log
     module Parser
 
-      def Parser.flatten_hash(hash, path = "")
+      def Parser.flatten_hash(hash, path = "", keep = nil)
         hash.each_with_object({}) do |(k, v), ret|
-          key = (path + k.to_s).tr('.','_')
-          if v.is_a? Hash
-            ret.merge! Parser.flatten_hash(v, key.to_s + "_")
+          if path == "" && !keep.nil? && k =~ keep
+            ret[k] = v
           else
-            ret[key] = v
+            key = (path + k.to_s).tr('.','_')
+            if v.is_a? Hash
+              ret.merge! Parser.flatten_hash(v, key.to_s + "_")
+            else
+              ret[key] = v
+            end
           end
         end
       end

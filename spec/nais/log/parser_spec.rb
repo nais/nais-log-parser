@@ -11,6 +11,11 @@ RSpec.describe Nais::Log::Parser do
       to eql({"a"=>"b", "c_c"=>"d", "e_f"=>"g", "h_i"=>"j", "h_k_l_l"=>"m"})
   end
 
+  it "does not flatten specified field in hash" do
+    expect(Nais::Log::Parser.flatten_hash({"a"=>"b", "c.c"=>"d", "e"=>{"f"=>"g"}, "h"=>{"i"=>"j", "k"=>{"l.l"=>"m"}}}, "", /^e$/)).
+      to eql({"a"=>"b", "c_c"=>"d", "e"=>{"f" => "g"}, "h_i"=>"j", "h_k_l_l"=>"m"})
+  end
+
   it "does not find exception" do
     expect(Nais::Log::Parser.get_keywords('Lorem ipsum dolor sit amet, consectetur adipiscing elit.', /\b[A-Z]\w+Exception\b/)).
       to be nil
