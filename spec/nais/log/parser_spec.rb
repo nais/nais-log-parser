@@ -72,6 +72,12 @@ RSpec.describe Nais::Log::Parser do
       to eql({'thread'=>'thread_name', 'component'=>'logger_name', 'level'=>'Level'})
   end
 
+  it "does rename level field if not string (loglevel)" do
+    r = {'thread_name'=>'thread_name','logger_name'=>'logger_name','level'=>42,'level_value'=>10000}
+    expect(Nais::Log::Parser.remap_java_fields(r)).
+      to eql({'thread'=>'thread_name', 'component'=>'logger_name', 'x_level'=>42})
+  end
+
   it "does remap log4j2 logs" do
     r = { "exception" => { "exception_class" => "java.lang.InterruptedException",
                            "exception_message" => "foobar",

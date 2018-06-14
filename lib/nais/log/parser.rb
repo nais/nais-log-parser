@@ -78,8 +78,12 @@ module Nais
         record["thread"] = record.delete("thread_name") if record.has_key?("thread_name")
         record["component"] = record.delete("logger_name") if record.has_key?("logger_name")
         if record.has_key?("level")
-          record["level"].capitalize!
-          record['level'] = 'Warning' if record['level'] == 'Warn'
+          if record['level'].is_a?(String)
+            record['level'].capitalize!
+            record['level'] = 'Warning' if record['level'] == 'Warn'
+          else
+            record['x_level'] = record.delete('level')
+          end
         end
         record.delete("level_value")
         record.delete("ndc")
