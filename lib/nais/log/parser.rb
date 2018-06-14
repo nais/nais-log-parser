@@ -3,6 +3,7 @@ require "nais/log/parser/version"
 require "time"
 require "json"
 require "logfmt"
+require "uri"
 
 module Nais
   module Log
@@ -135,6 +136,43 @@ module Nais
           }
         end
         return r.empty? ? nil : r
+      end
+
+      def Parser.parse_uri(str)
+        r = {}
+        unless str.nil?
+          i = str.index('?')
+          if i.nil?
+            r['path'] = URI.decode(str)
+          else
+            if i != 0
+              r['path'] = URI.decode(str[0,i])
+            end
+            if i+1 < str.length
+              query = str[i+1, str.length]
+              kv = {}
+              query.scan(/([^=&]+)=([^&]+)/) do |k,v|
+                k.gsub!(/\+/, ' ')
+                k = URI.decode(k)
+                v.gsub!(/\+/, ' ')
+                v = URI.decode(v)
+                if kv.has_key?(k)
+                  if kv[k].is_a?(Array)
+                    next if kv[k].include?(v)
+                    kv[k].push(v)
+                  else
+                    next if kv[k] == v
+                    kv[k] = [kv[k], v]
+                  end
+                else
+                  kv[k] = v
+                end
+              end
+              r['query_params'] = kv unless kv.empty?
+            end
+          end
+        end
+        r
       end
 
       def Parser.parse_accesslog(str)

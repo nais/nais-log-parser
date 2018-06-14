@@ -355,4 +355,20 @@ RSpec.describe Nais::Log::Parser do
               "err" => "no token found"})
   end
 
+  it "does decode uri without query string" do
+    expect(Nais::Log::Parser.parse_uri('/foobar/zot/%41%42%43')).
+      to eql({"path" => "/foobar/zot/ABC"})
+  end
+
+  it "does decode uri with empty query string" do
+    expect(Nais::Log::Parser.parse_uri('/foobar/zot/%41%42%43?')).
+      to eql({"path" => "/foobar/zot/ABC"})
+  end
+
+  it "does decode uri with query string" do
+    expect(Nais::Log::Parser.parse_uri('/foobar/zot/%41%42%43?foo=bar&zot&array=a+1&array=b%202')).
+      to eql({"path" => "/foobar/zot/ABC",
+              "query_params" => {"foo" => "bar", "array" => ["a 1", "b 2"]}})
+  end
+
 end
