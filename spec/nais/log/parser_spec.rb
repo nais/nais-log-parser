@@ -242,6 +242,37 @@ RSpec.describe Nais::Log::Parser do
               "timestamp" => Time.now.year.to_s+"-09-26T13:36:57.136153000+02:00"})
   end
 
+  it "does return nil on non-simple log" do
+    expect(Nais::Log::Parser.parse_simple('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does parse simple log" do
+    expect(Nais::Log::Parser.parse_simple('2018-07-31T12:56:12.828 INFO [main] org.apache.catalina.startup.Catalina.start Server startup in 59702 ms')).
+      to eql({"level" => "INFO",
+              "thread" => "main",
+              "message" => "Server startup in 59702 ms",
+              "component" => "org.apache.catalina.startup.Catalina.start",
+              "timestamp" => '2018-07-31T10:56:12.828000000Z'})
+  end
+
+  it "does parse simple log without thread" do
+    expect(Nais::Log::Parser.parse_simple('2018-07-31T12:56:12,828 INFO org.apache.catalina.startup.Catalina.start Server startup in 59702 ms')).
+      to eql({"level" => "INFO",
+              "message" => "Server startup in 59702 ms",
+              "component" => "org.apache.catalina.startup.Catalina.start",
+              "timestamp" => '2018-07-31T10:56:12.828000000Z'})
+  end
+
+  it "does parse simple log without millisecond timestamp" do
+    expect(Nais::Log::Parser.parse_simple('2018-07-31 12:56:12 INFO [foo.bar] org.apache.catalina.startup.Catalina.start Server startup in 59702 ms')).
+      to eql({"level" => "INFO",
+              "thread" => "foo.bar",
+              "message" => "Server startup in 59702 ms",
+              "component" => "org.apache.catalina.startup.Catalina.start",
+              "timestamp" => '2018-07-31T10:56:12.000000000Z'})
+  end
+
   it "does return nil on non-capnslog" do
     expect(Nais::Log::Parser.parse_capnslog('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
       to be nil

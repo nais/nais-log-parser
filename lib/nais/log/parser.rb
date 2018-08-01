@@ -259,6 +259,20 @@ module Nais
         end
       end
 
+      def Parser.parse_simple(str)
+        if !str.nil? && m = str.match(/^(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:[,.]\d{3,9})?) ([a-zA-Z]+) (?:\[([^\]]+)\] )?(\S+) (.*)/)
+          r = {}
+          r['timestamp'] = Time.parse(m[1]).gmtime.iso8601(9)
+          r['level'] = m[2]
+          r['thread'] = m[3] if !m[3].nil?
+          r['component'] = m[4]
+          r['message'] = m[5]
+          return r
+        else
+          return nil
+        end
+      end
+
       # https://github.com/coreos/pkg/tree/master/capnslog
       def Parser.parse_capnslog(str)
         if !str.nil? && m = str.match(/^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{6}) ([TDNIWEC]) \| ([^:]+):\s*(.*)/)
