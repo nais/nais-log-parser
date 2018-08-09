@@ -228,7 +228,7 @@ module Nais
 
       def Parser.parse_gokit(str)
         r = Logfmt.parse(str)
-        if !r.nil? && r.has_key?('ts') && r.has_key?('level') && r.has_key?('msg')
+        if !r.nil? && r.has_key?('ts') && r.has_key?('level') && (r.has_key?('msg') || r.has_key?('err'))
           r
         else
           nil

@@ -397,6 +397,15 @@ RSpec.describe Nais::Log::Parser do
               "err" => "no token found"})
   end
 
+  it "does parse go-kit error without message" do
+    expect(Nais::Log::Parser.parse_gokit('level=error ts=2018-08-09T09:02:36.303114134Z caller=main.go:218 component=k8s_client_runtime err="github.com/prometheus/prometheus/discovery/kubernetes/kubernetes.go:325: Failed to list *v1.Service: Get https://10.42.42.42:443/api/v1/services?resourceVersion=0: dial tcp 10.254.0.1:443: connect: connection refused"')).
+      to eql({"ts" => "2018-08-09T09:02:36.303114134Z",
+              "level" => "error",
+              "err" => "github.com/prometheus/prometheus/discovery/kubernetes/kubernetes.go:325: Failed to list *v1.Service: Get https://10.42.42.42:443/api/v1/services?resourceVersion=0: dial tcp 10.254.0.1:443: connect: connection refused",
+              "caller" => "main.go:218",
+              "component" => "k8s_client_runtime"})
+  end
+
   it "does decode uri without query string" do
     expect(Nais::Log::Parser.parse_uri('/foobar/zot/%41%42%43')).
       to eql({"path" => "/foobar/zot/ABC"})
