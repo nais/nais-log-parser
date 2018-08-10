@@ -183,6 +183,42 @@ module Nais
         r
       end
 
+      def Parser.parse_redis(str)
+        if !str.nil? && m = str.match(/^(?:\[(\d+)\]|(\d+):([XCSM])) (\d{1,2} \S{3,} \d\d:\d\d:\d\d\.\d\d\d) ([-.*#]) (.+)/)
+          r = {}
+          if m[3].nil?
+            r['thread'] = m[1]
+          else
+            r['thread'] = m[2]
+            r['component'] = case m[3]
+                             when 'X'
+                               'sentinel'
+                             when 'C'
+                               'persistence'
+                             when 'S'
+                               'slave'
+                             when 'M'
+                               'master'
+                             end
+          end
+          r['timestamp'] = Time.strptime(m[4]+'Z', "%d %b %H:%M:%S.%L%Z").gmtime.iso8601(3)
+          r['level'] = case m[5]
+                       when '.'
+                         'Debug'
+                       when '-'
+                         'Info'
+                       when '*'
+                         'Info'
+                       when '#'
+                         'Error'
+                       end
+          r['message'] = m[6]
+          return r
+        else
+          return nil
+        end
+      end
+
       def Parser.parse_accesslog(str)
         if !str.nil? && m = str.match(/^(\S+) +(?:(\S+) )?(\S+) \[([^\]]+)\] \"([^\"]*)\" (\S+) (\S+)(.*)/)
           r = {}

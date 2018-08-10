@@ -125,6 +125,28 @@ RSpec.describe Nais::Log::Parser do
               'pod'=>'pod_name'})
   end
 
+  it "does return nil on non redis log" do
+    expect(Nais::Log::Parser.parse_redis('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does parse redis2 log" do
+    expect(Nais::Log::Parser.parse_redis('[4018] 14 Nov 07:01:22.119 * Background saving terminated with success')).
+      to eql({"thread"=>"4018",
+              "timestamp"=>"2018-11-14T07:01:22.119Z",
+              "level"=>"Info",
+               "message"=>"Background saving terminated with success"})
+  end
+
+  it "does parse redis3 log" do
+    expect(Nais::Log::Parser.parse_redis('1:S 10 Aug 08:56:10.311 # Error condition on socket for SYNC: Connection refused')).
+      to eql({"thread"=>"1",
+              "timestamp"=>"2018-08-10T08:56:10.311Z",
+              "level"=>"Error",
+              "component"=>"slave",
+              "message"=>"Error condition on socket for SYNC: Connection refused"})
+  end
+
   it "does return nil on non-accesslog" do
     expect(Nais::Log::Parser.parse_accesslog('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
       to be nil
