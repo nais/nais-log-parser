@@ -1,5 +1,8 @@
 # coding: utf-8
+require "time"
 require "spec_helper"
+
+ENV['TZ']='UTC'
 
 RSpec.describe Nais::Log::Parser do
   it "has a version number" do
@@ -106,23 +109,6 @@ RSpec.describe Nais::Log::Parser do
               "mdc1" => "val1",
               "mdc2" => "val2"
              });
-  end
-
-  it "does remap kubernetes fields" do
-    r = {'stream'=>'stdout',
-         'docker'=>{'container_id'=>'container_id','foo'=>'bar'},
-         'kubernetes'=>{'host'=>'host',
-                        'namespace_name'=>'namespace_name',
-                        'container_name'=>'container_name',
-                        'pod_name'=>'pod_name',
-                        'foo'=>'bar'}}
-    expect(Nais::Log::Parser.remap_kubernetes_fields(r)).
-      to eql({'application'=>'container_name',
-              'category'=>'stdout',
-              'container'=>'container_id',
-              'host'=>'host',
-              'namespace'=>'namespace_name',
-              'pod'=>'pod_name'})
   end
 
   it "does return nil on non redis log" do
@@ -261,7 +247,7 @@ RSpec.describe Nais::Log::Parser do
               "line" => "201",
               "message" => "k8s.io/kube-state-metrics/collectors/persistentvolumeclaim.go:60: Failed to list *v1.PersistentVolumeClaim: User \"system:serviceaccount:nais:nais-prometheus-prometheus-kube-state-metrics\" cannot list persistentvolumeclaims at the cluster scope. (get persistentvolumeclaims)",
               "thread" => "6",
-              "timestamp" => Time.now.year.to_s+"-09-26T13:36:57.136153000+02:00"})
+              "timestamp" => Time.now.year.to_s+"-09-26T13:36:57.136153000Z"})
   end
 
   it "does return nil on non-simple log" do
@@ -275,7 +261,7 @@ RSpec.describe Nais::Log::Parser do
               "thread" => "main",
               "message" => "Server startup in 59702 ms",
               "component" => "org.apache.catalina.startup.Catalina.start",
-              "timestamp" => '2018-07-31T10:56:12.828000000Z'})
+              "timestamp" => '2018-07-31T12:56:12.828000000Z'})
   end
 
   it "does parse simple log without thread" do
@@ -283,7 +269,7 @@ RSpec.describe Nais::Log::Parser do
       to eql({"level" => "INFO",
               "message" => "Server startup in 59702 ms",
               "component" => "org.apache.catalina.startup.Catalina.start",
-              "timestamp" => '2018-07-31T10:56:12.828000000Z'})
+              "timestamp" => '2018-07-31T12:56:12.828000000Z'})
   end
 
   it "does parse simple log without millisecond timestamp" do
@@ -292,7 +278,7 @@ RSpec.describe Nais::Log::Parser do
               "thread" => "foo.bar",
               "message" => "Server startup in 59702 ms",
               "component" => "org.apache.catalina.startup.Catalina.start",
-              "timestamp" => '2018-07-31T10:56:12.000000000Z'})
+              "timestamp" => '2018-07-31T12:56:12.000000000Z'})
   end
 
   it "does return nil on non-capnslog" do
@@ -305,7 +291,7 @@ RSpec.describe Nais::Log::Parser do
       to eql({"level" => "Info",
               "component" => "op-k8sutil",
               "message" => "cluster role rook-agent already exists. Updating if needed.",
-              "timestamp" => "2017-11-22T17:06:45.734626000+01:00"})
+              "timestamp" => "2017-11-22T17:06:45.734626000Z"})
   end
 
   it "does return nil on non-influxdb log" do

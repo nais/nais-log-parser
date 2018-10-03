@@ -32,22 +32,6 @@ module Nais
         end
       end
 
-      def Parser.remap_kubernetes_fields(record)
-        record["category"] = record.delete("stream") if record.has_key?("stream")
-        if record["docker"].is_a?(Hash)
-          record["container"] = record["docker"]["container_id"]
-          record.delete("docker")
-        end
-        if record["kubernetes"].is_a?(Hash)
-          record["host"] = record["kubernetes"]["host"]
-          record["namespace"] = record["kubernetes"]["namespace_name"]
-          record["application"] = record["kubernetes"]["container_name"]
-          record["pod"] = record["kubernetes"]["pod_name"]
-          record.delete("kubernetes")
-        end
-        record
-      end
-
       def Parser.merge_json_field(record, field)
         if record.has_key?(field)
           value = record[field].strip
@@ -201,7 +185,7 @@ module Nais
                                'master'
                              end
           end
-          r['timestamp'] = Time.strptime(m[4]+'Z', "%d %b %H:%M:%S.%L%Z").gmtime.iso8601(3)
+          r['timestamp'] = Time.strptime(m[4]+'Z', "%d %b %H:%M:%S.%L%Z").utc.iso8601(3)
           r['level'] = case m[5]
                        when '.'
                          'Debug'
@@ -284,7 +268,7 @@ module Nais
                        when 'F'
                          'Critical'
                        end
-          r['timestamp'] = Time.strptime(m[2], "%m%d %H:%M:%S.%N").iso8601(9)
+          r['timestamp'] = Time.strptime(m[2], "%m%d %H:%M:%S.%N").utc.iso8601(9)
           r['thread'] = m[3]
           r['file'] = m[4]
           r['line'] = m[5]
@@ -298,7 +282,7 @@ module Nais
       def Parser.parse_simple(str)
         if !str.nil? && m = str.match(/^(\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:[,.]\d{3,9})?) ([a-zA-Z]+) (?:\[([^\]]+)\] )?(\S+) (.*)/)
           r = {}
-          r['timestamp'] = Time.parse(m[1]).gmtime.iso8601(9)
+          r['timestamp'] = Time.parse(m[1]).utc.iso8601(9)
           r['level'] = m[2]
           r['thread'] = m[3] if !m[3].nil?
           r['component'] = m[4]
@@ -313,7 +297,7 @@ module Nais
       def Parser.parse_capnslog(str)
         if !str.nil? && m = str.match(/^(\d{4}-\d\d-\d\d \d\d:\d\d:\d\d\.\d{6}) ([TDNIWEC]) \| ([^:]+):\s*(.*)/)
           r = {}
-          r['timestamp'] = Time.strptime(m[1], "%Y-%m-%d %H:%M:%S.%N").iso8601(9)
+          r['timestamp'] = Time.strptime(m[1], "%Y-%m-%d %H:%M:%S.%N").utc.iso8601(9)
           r['level'] = case m[2]
                        when 'T'
                          'Trace'
