@@ -111,6 +111,25 @@ RSpec.describe Nais::Log::Parser do
              });
   end
 
+  it "does return nil on non coredns log" do
+    expect(Nais::Log::Parser.parse_coredns('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does parse coredns log" do
+    expect(Nais::Log::Parser.parse_coredns('2018-10-30T19:10:07.547Z [INFO] [::1]:50759 - 29008 "A IN example.org. udp 41 false 4096" NOERROR qr,rd,ra,ad 68 0.037990251s')).
+      to eql({"timestamp"=>"2018-10-30T19:10:07.547Z",
+              "level" => "INFO",
+              "remote_ip" => "[::1]",
+              "remote_port" => "50759",
+              "query_id" => "29008",
+              "message" => "A IN example.org. udp 41 false 4096",
+              "response_code" => "NOERROR",
+              "flags" => ["qr","rd","ra","ad"],
+              "content_length" => "68",
+              "duration" => "0.037990251"})
+  end
+
   it "does return nil on non redis log" do
     expect(Nais::Log::Parser.parse_redis('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
       to be nil

@@ -167,6 +167,25 @@ module Nais
         r
       end
 
+      def Parser.parse_coredns(str)
+        if !str.nil? && m = str.match(/^(\S+) \[([^\]]+?)\] (\S+?):(\d+) - (\d+) \"([^\"]*)\" (\S+) (\S+) (\d+) (\d+(?:\.\d+)?)s$/)
+          r = {}
+          r['timestamp'] = m[1]
+          r['level'] = m[2]
+          r['remote_ip'] = m[3]
+          r['remote_port'] = m[4]
+          r['query_id'] = m[5]
+          r['message'] = m[6]
+          r['response_code'] = m[7]
+          r['flags'] = m[8].split(',')
+          r['content_length'] = m[9]
+          r['duration'] = m[10]
+          return r
+        else
+          return nil
+        end
+      end
+
       def Parser.parse_redis(str)
         if !str.nil? && m = str.match(/^(?:\[(\d+)\]|(\d+):([XCSM])) (\d{1,2} \S{3,} \d\d:\d\d:\d\d\.\d\d\d) ([-.*#]) (.+)/)
           r = {}
