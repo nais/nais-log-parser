@@ -134,7 +134,7 @@ RSpec.describe Nais::Log::Parser do
               "response_code" => "NOERROR",
               "flags" => ["qr","rd","ra","ad"],
               "content_length" => "68",
-              "duration" => "0.037990251"})
+              "processing_time" => "0.037990251"})
   end
 
   it "does return nil on non redis log" do

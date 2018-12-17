@@ -182,7 +182,7 @@ module Nais
             r['response_code'] = m[5]
             r['flags'] = m[6].split(',')
             r['content_length'] = m[7]
-            r['duration'] = m[8]
+            r['processing_time'] = m[8]
           end
           return r
         else
