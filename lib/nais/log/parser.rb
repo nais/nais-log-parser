@@ -190,6 +190,27 @@ module Nais
         end
       end
 
+      def Parser.parse_rook(str)
+        if !str.nil? && m = str.match(/^(\d\d\d\d-\d\d-\d\d \d\d:\d\d:\d\d\.\d+) ([IWE]) \| ([^:]+): (.+)$/)
+          r = {}
+          r['timestamp'] = Time.parse(m[1]).utc.iso8601(9)
+          r['level'] = case m[2]
+                       when 'I'
+                         'Info'
+                       when 'W'
+                         'Warning'
+                       when 'E'
+                         'Error'
+                       end
+          r['component'] = m[3]
+          msg = m[4]
+          r['message'] = msg
+          return r
+        else
+          return nil
+        end
+      end
+
       def Parser.parse_redis(str)
         if !str.nil? && m = str.match(/^(?:\[(\d+)\]|(\d+):([XCSM])) (\d{1,2} \S{3,} \d\d:\d\d:\d\d\.\d\d\d) ([-.*#]) (.+)/)
           r = {}

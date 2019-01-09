@@ -137,6 +137,19 @@ RSpec.describe Nais::Log::Parser do
               "processing_time" => "0.037990251"})
   end
 
+  it "does return nil on non rook log" do
+    expect(Nais::Log::Parser.parse_rook('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
+      to be nil
+  end
+
+  it "does parse rook log" do
+    expect(Nais::Log::Parser.parse_rook('2019-01-09 07:17:30.267249 I | exec: Running command: ceph osd dump --cluster=rook --conf=/var/lib/rook/rook/rook.config --keyring=/var/lib/rook/rook/client.admin.keyring --format json --out-file /tmp/707633009')).
+      to eql({"component"=>"exec",
+              "timestamp"=>"2019-01-09T07:17:30.267249000Z",
+              "level"=>"Info",
+              "message"=>"Running command: ceph osd dump --cluster=rook --conf=/var/lib/rook/rook/rook.config --keyring=/var/lib/rook/rook/client.admin.keyring --format json --out-file /tmp/707633009"})
+  end
+
   it "does return nil on non redis log" do
     expect(Nais::Log::Parser.parse_redis('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
       to be nil
@@ -145,15 +158,15 @@ RSpec.describe Nais::Log::Parser do
   it "does parse redis2 log" do
     expect(Nais::Log::Parser.parse_redis('[4018] 14 Nov 07:01:22.119 * Background saving terminated with success')).
       to eql({"thread"=>"4018",
-              "timestamp"=>"2018-11-14T07:01:22.119Z",
+              "timestamp"=>Time.new.year.to_s+"-11-14T07:01:22.119Z",
               "level"=>"Info",
-               "message"=>"Background saving terminated with success"})
+              "message"=>"Background saving terminated with success"})
   end
 
   it "does parse redis3 log" do
     expect(Nais::Log::Parser.parse_redis('1:S 10 Aug 08:56:10.311 # Error condition on socket for SYNC: Connection refused')).
       to eql({"thread"=>"1",
-              "timestamp"=>"2018-08-10T08:56:10.311Z",
+              "timestamp"=>Time.new.year.to_s+"-08-10T08:56:10.311Z",
               "level"=>"Error",
               "component"=>"slave",
               "message"=>"Error condition on socket for SYNC: Connection refused"})
