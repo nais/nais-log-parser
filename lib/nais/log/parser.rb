@@ -46,6 +46,55 @@ module Nais
         record
       end
 
+      def Parser.remap_journald_fields(record)
+        record.delete('boot_id')
+        record['severity'] = record.delete('priority')
+        record['level'] = case record['severity']
+                          when '7'
+                            'Debug'
+                          when '6'
+                            'Info'
+                          when '5'
+                            'Notice'
+                          when '4'
+                            'Warning'
+                          when '3'
+                            'Error'
+                          when '2'
+                            'Critical'
+                          when '1'
+                            'Alert'
+                          when '0'
+                            'Emergency'
+                          end
+        # keep record['uid']
+        # keep record['gid']
+        record.delete('cap_effective')
+        record.delete('code_file')
+        record.delete('code_line')
+        record.delete('code_func')
+        record.delete('systemd_slice')
+        record.delete('cap_effective')
+        record['category'] = record.delete('transport')
+        record.delete('machine_id')
+        record['host'] = record.delete('hostname')
+        record.delete('selinux_context')
+        record.delete('stream_id')
+        record['program'] = record.delete('syslog_identifier')
+        # keep record['pid']
+        record['command'] = record.delete('comm')
+        record.delete('exe')
+        # keep record['cmdline']
+        record.delete('systemd_cgroup')
+        record.delete('systemd_unit')
+        record.delete('systemd_invocation_id')
+        # keep record['message']
+        if record.has_key?('source_realtime_timestamp')
+          record['@timestamp'] = record.delete('source_realtime_timestamp')
+        end
+        record
+      end
+
       def Parser.remap_elasticsearch_fields(time, record)
         record["received_at"] = Time.new.iso8601(9)
         unless record.has_key?("@timestamp")
