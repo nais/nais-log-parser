@@ -138,7 +138,7 @@ module Nais
         record.delete('stream_id')
         record['program'] = record.delete('syslog_identifier')
         # keep record['pid']
-        record['command'] = record.delete('comm')
+        record['command'] = record.delete('comm') if record.has_key?('comm')
         record.delete('exe')
         # keep record['cmdline']
         # keep record['interface']
