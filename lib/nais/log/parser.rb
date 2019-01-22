@@ -67,57 +67,59 @@ module Nais
                           when '0'
                             'Emergency'
                           end
-        record['facility'] = case record['syslog_facility']
-                             when '23'
-                               'local7'
-                             when '22'
-                               'local6'
-                             when '21'
-                               'local5'
-                             when '20'
-                               'local4'
-                             when '19'
-                               'local3'
-                             when '18'
-                               'local2'
-                             when '17'
-                               'local1'
-                             when '16'
-                               'local0'
-                             when '15'
-                               'cron'
-                             when '14'
-                               'logalert'
-                             when '13'
-                               'logaudit'
-                             when '12'
-                               'ntp'
-                             when '11'
-                               'ftp'
-                             when '10'
-                               'authpriv'
-                             when '9'
-                               'clock'
-                             when '8'
-                               'uucp'
-                             when '7'
-                               'news'
-                             when '6'
-                               'lpr'
-                             when '5'
-                               'syslog'
-                             when '4'
-                               'auth'
-                             when '3'
-                               'daemon'
-                             when ''
-                               'mail'
-                             when '1'
-                               'user'
-                             when '0'
-                               'kern'
-                             end
-        record.delete('syslog_facility')
+        if record.has_key?('syslog_facility')
+          record['facility'] = case record['syslog_facility']
+                               when '23'
+                                 'local7'
+                               when '22'
+                                 'local6'
+                               when '21'
+                                 'local5'
+                               when '20'
+                                 'local4'
+                               when '19'
+                                 'local3'
+                               when '18'
+                                 'local2'
+                               when '17'
+                                 'local1'
+                               when '16'
+                                 'local0'
+                               when '15'
+                                 'cron'
+                               when '14'
+                                 'logalert'
+                               when '13'
+                                 'logaudit'
+                               when '12'
+                                 'ntp'
+                               when '11'
+                                 'ftp'
+                               when '10'
+                                 'authpriv'
+                               when '9'
+                                 'clock'
+                               when '8'
+                                 'uucp'
+                               when '7'
+                                 'news'
+                               when '6'
+                                 'lpr'
+                               when '5'
+                                 'syslog'
+                               when '4'
+                                 'auth'
+                               when '3'
+                                 'daemon'
+                               when ''
+                                 'mail'
+                               when '1'
+                                 'user'
+                               when '0'
+                                 'kern'
+                               end
+          record.delete('syslog_facility')
+        end
         record.delete('syslog_pid')
         record.delete('syslog_timestamp')
         record.delete('syslog_raw')
@@ -139,12 +141,15 @@ module Nais
         record['command'] = record.delete('comm')
         record.delete('exe')
         # keep record['cmdline']
+        # keep record['interface']
         record.delete('systemd_cgroup')
         record.delete('systemd_unit')
         record.delete('systemd_invocation_id')
         # keep record['message']
         if record.has_key?('source_realtime_timestamp')
           record['@timestamp'] = record.delete('source_realtime_timestamp')
+        elsif record.has_key?('source_monotonic_timestamp')
+          record['@timestamp'] = record.delete('source_monotonic_timestamp')
         end
         record
       end
