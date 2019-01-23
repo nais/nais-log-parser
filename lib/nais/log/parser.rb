@@ -48,8 +48,7 @@ module Nais
 
       def Parser.remap_journald_fields(record)
         record.delete('boot_id')
-        record['severity'] = record.delete('priority')
-        record['level'] = case record['severity']
+        record['level'] = case record['priority']
                           when '7'
                             'Debug'
                           when '6'
@@ -67,6 +66,7 @@ module Nais
                           when '0'
                             'Emergency'
                           end
+        record.delete('priority')
         if record.has_key?('syslog_facility')
           record['facility'] = case record['syslog_facility']
                                when '23'
@@ -146,6 +146,7 @@ module Nais
         record.delete('systemd_unit')
         record.delete('systemd_invocation_id')
         # keep record['message']
+        record.delete('source_monotonic_timestamp')
         ts = record.delete('source_realtime_timestamp')
         unless ts.nil?
           record['@timestamp'] = Time.at(ts[0..9].to_i, ts[10..16].to_i).utc.iso8601(6)
