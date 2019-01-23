@@ -146,7 +146,7 @@ module Nais
         record.delete('systemd_unit')
         record.delete('systemd_invocation_id')
         # keep record['message']
-        ts = record.delete('source_realtime_timestamp') || record.delete('source_monotonic_timestamp')
+        ts = record.delete('source_realtime_timestamp')
         unless ts.nil?
           record['@timestamp'] = Time.at(ts[0..9].to_i, ts[10..16].to_i).utc.iso8601(6)
         end
