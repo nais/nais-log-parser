@@ -140,7 +140,7 @@ module Nais
         # keep record['pid']
         record['command'] = record.delete('comm') if record.has_key?('comm')
         record.delete('exe')
-        # keep record['cmdline']
+        record.delete('cmdline')
         # keep record['interface']
         record.delete('systemd_cgroup')
         record.delete('systemd_unit')
