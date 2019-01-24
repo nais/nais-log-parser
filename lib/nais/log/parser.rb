@@ -149,7 +149,7 @@ module Nais
         record.delete('source_monotonic_timestamp')
         ts = record.delete('source_realtime_timestamp')
         unless ts.nil?
-          record['@timestamp'] = Time.at(ts[0..9].to_i, ts[10..16].to_i).utc.iso8601(6)
+          record['timestamp'] = Time.at(ts[0..9].to_i, ts[10..16].to_i).utc.iso8601(6)
         end
         record
       end
@@ -195,7 +195,7 @@ module Nais
 
       # remap fields from https://github.com/inconshreveable/log15/
       def Parser.remap_log15(record)
-        record['@timestamp'] = record.delete('t') if record.has_key?('t')
+        record['timestamp'] = record.delete('t') if record.has_key?('t')
         record['message'] = record.delete('msg') if record.has_key?('msg')
         record['component'] = record.delete('logger') if record.has_key?('logger')
         if record.has_key?('lvl')
