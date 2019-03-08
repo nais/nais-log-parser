@@ -9,6 +9,12 @@ module Nais
   module Log
     module Parser
 
+      def Parser.string_array(array)
+        array.each_with_object([]) do |item, v|
+          v << item.to_s
+        end
+      end
+
       def Parser.flatten_hash(hash, path = "", keep = nil)
         hash.each_with_object({}) do |(k, v), ret|
           if path == "" && !keep.nil? && k =~ keep
@@ -17,6 +23,8 @@ module Nais
             key = (path + k.to_s).tr('.','_')
             if v.is_a? Hash
               ret.merge! Parser.flatten_hash(v, key.to_s + "_")
+            elsif v.is_a? Array
+              ret[key] = string_array(v)
             else
               ret[key] = v
             end

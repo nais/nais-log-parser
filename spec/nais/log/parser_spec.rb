@@ -9,6 +9,11 @@ RSpec.describe Nais::Log::Parser do
     expect(Nais::Log::Parser::VERSION).not_to be nil
   end
 
+  it "does convert array elements to string" do
+    expect(Nais::Log::Parser.string_array(["a", 2, {"foo": "bar"}, ["a", 'b', "c"]])).
+      to eql(['a', '2', '{:foo=>"bar"}', '["a", "b", "c"]'])
+  end
+
   it "does flatten hash" do
     expect(Nais::Log::Parser.flatten_hash({"a"=>"b", "c.c"=>"d", "e"=>{"f"=>"g"}, "h"=>{"i"=>"j", "k"=>{"l.l"=>"m"}}})).
       to eql({"a"=>"b", "c_c"=>"d", "e_f"=>"g", "h_i"=>"j", "h_k_l_l"=>"m"})
@@ -17,6 +22,11 @@ RSpec.describe Nais::Log::Parser do
   it "does not flatten specified field in hash" do
     expect(Nais::Log::Parser.flatten_hash({"a"=>"b", "c.c"=>"d", "e"=>{"f"=>"g"}, "h"=>{"i"=>"j", "k"=>{"l.l"=>"m"}}}, "", /^e$/)).
       to eql({"a"=>"b", "c_c"=>"d", "e"=>{"f" => "g"}, "h_i"=>"j", "h_k_l_l"=>"m"})
+  end
+
+  it "does flatten hash with array elements" do
+    expect(Nais::Log::Parser.flatten_hash({"a"=>"b", "c"=>{"d"=>["e", 7]}})).
+      to eql({"a"=>"b", "c_d"=>["e", "7"]})
   end
 
   it "does not find exception" do
