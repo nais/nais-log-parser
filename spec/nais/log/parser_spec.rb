@@ -485,4 +485,25 @@ RSpec.describe Nais::Log::Parser do
       to eql({'facility'=>'daemon','level'=>'Info', 'uid'=>'0', 'gid'=>'0', 'category'=>'stdout','host'=>'e34apvl00685.devillo.no','program'=>'update_engine','pid'=>'703','command'=>'update_engine','message'=>'I0117 14:30:46.485997   703 action_processor.cc:73] ActionProcessor::ActionComplete: finished last action of type OmahaRequestAction','timestamp'=>'2019-01-22T11:05:11.168093Z'})
   end
 
+  it "does remap elasticsearch fields" do
+    t = Time.now
+    r = {"@timestamp"=>"2019-04-10 13:54:19,441", "level"=>"Info", "log"=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit"}
+    expect(Nais::Log::Parser.remap_elasticsearch_fields(t, r).tap { |hs| hs.delete("received_at") }).
+      to eql({'@timestamp'=>'2019-04-10T13:54:19.441000000+00:00', 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
+  end
+
+  it "does remap elasticsearch fields on record without timestamp" do
+    t = Time.now
+    r = {"level"=>"Info", "log"=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit"}
+    expect(Nais::Log::Parser.remap_elasticsearch_fields(t, r).tap { |hs| hs.delete("received_at") }).
+      to eql({'@timestamp'=>t.iso8601(9), 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
+  end
+
+  it "does remap elasticsearch fields on record with illegal timestamp" do
+    t = Time.now
+    r = {"@timestamp"=>"foo", "level"=>"Info", "log"=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit"}
+    expect(Nais::Log::Parser.remap_elasticsearch_fields(t, r).tap { |hs| hs.delete("received_at") }).
+      to eql({'@timestamp'=>t.iso8601(9), 'unparsed_timestamp'=>'foo', 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
+  end
+
 end

@@ -169,8 +169,14 @@ module Nais
       def Parser.remap_elasticsearch_fields(time, record)
         record["received_at"] = Time.new.iso8601(9)
         unless record.has_key?("@timestamp")
-          record["@timestamp"] = record.delete("timestamp") || record.delete("time") || record.delete("ts") || Time.at(time).iso8601(9)
+          record["@timestamp"] = record.delete("timestamp") || record.delete("time") || record.delete("ts")
         end
+        begin
+          record["@timestamp"] = Time.parse(record["@timestamp"]).iso8601(9) if record.has_key?("@timestamp") && !record["@timestamp"].nil?
+        rescue ArgumentError
+          record["unparsed_timestamp"] = record.delete("@timestamp") unless record["@timestamp"].nil?
+        end
+        record["@timestamp"] = Time.at(time).iso8601(9) if !record.has_key?("@timestamp") || record["@timestamp"].nil?
         unless record.has_key?("message")
           record["message"] = record.delete("msg") || record.delete("log")
         end
