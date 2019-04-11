@@ -492,6 +492,13 @@ RSpec.describe Nais::Log::Parser do
       to eql({'@timestamp'=>'2019-04-10T13:54:19.441000000+00:00', 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
   end
 
+  it "does remap elasticsearch fields on record with timestamp and timezone" do
+    t = Time.now
+    r = {"@timestamp"=>"2019-04-11T10:06:53.389+02:00", "level"=>"Info", "log"=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit"}
+    expect(Nais::Log::Parser.remap_elasticsearch_fields(t, r).tap { |hs| hs.delete("received_at") }).
+      to eql({'@timestamp'=>'2019-04-11T10:06:53.389000000+02:00', 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
+  end
+
   it "does remap elasticsearch fields on record without timestamp" do
     t = Time.now
     r = {"level"=>"Info", "log"=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit"}
