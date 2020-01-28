@@ -376,7 +376,7 @@ module Nais
       def Parser.parse_accesslog(str)
         if !str.nil? && m = str.match(/^(\S+) +(?:(\S+) )?(\S+) \[([^\]]+)\] \"([^\"]*)\" (\S+) (\S+)(.*)/)
           r = {}
-          r['remote_ip'] = m[1]
+          r['remote_ip'] = m[1] unless m[1] == '-'
           r['ident'] = m[2] unless (m[2].nil? || m[2] == '-')
           r['user'] = m[3] unless m[3] == '-'
           r['timestamp'] = Time.strptime(m[4], "%d/%b/%Y:%H:%M:%S %Z").iso8601
