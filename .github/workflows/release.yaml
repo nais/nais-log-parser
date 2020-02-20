@@ -20,26 +20,26 @@ jobs:
         with:
           ruby-version: 2.6.x
       - name: Install bundler
-        run: |
-          gem install bundler
-          bundle install
+        run: gem install bundler
+      - name: Install gems
+        run:  bundle install
       - name: Run rspec
         run: bundle exec rspec spec
       - name: Build gem
         run: gem build nais-log-parser.gemspec
       - name: Verify unreleased
         run: |
-          version=$(ruby -I lib -r nais-log-parser -e 'print Nais::Log::Parser::VERSION')
+          version=$(ruby -I lib -r nais/log/parser -e 'print Nais::Log::Parser::VERSION')
           ! curl -s https://api.github.com/repos/$GITHUB_REPOSITORY/git/refs | grep -q "\"refs/tags/$version\""
       - name: Tag release
         run: |
           commit=$(git rev-parse HEAD)
-          version=$(ruby -I lib -r nais-log-parser -e 'print Nais::Log::Parser::VERSION')
+          version=$(ruby -I lib -r nais/log/parser -e 'print Nais::Log::Parser::VERSION')
           curl -s -X POST https://api.github.com/repos/$GITHUB_REPOSITORY/git/refs -H "Authorization: token $GITHUB_TOKEN" -d "{ \"ref\": \"refs/tags/$version\", \"sha\": \"$commit\" }"
       - name: Publish gem
         run: |
           mkdir -p $HOME/.gem
           printf -- "---\n:github: Bearer ${GITHUB_TOKEN}\n" > $HOME/.gem/credentials
           chmod 0600 $HOME/.gem/credentials
-          version=$(ruby -I lib -r nais-log-parser -e 'print Nais::Log::Parser::VERSION')
+          version=$(ruby -I lib -r nais/log/parser -e 'print Nais::Log::Parser::VERSION')
           gem push --key github --host https://rubygems.pkg.github.com/$(echo $GITHUB_REPOSITORY | cut -f1 -d/) nais-log-parser-$version.gem
