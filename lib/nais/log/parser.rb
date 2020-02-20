@@ -294,11 +294,10 @@ module Nais
       end
 
       def Parser.parse_coredns(str)
-        if !str.nil? && m = str.match(/^(\S+) \[([^\]]+?)\] (.+)$/)
+        if !str.nil? && m = str.match(/^\[([^\]]+?)\] (.+)$/)
           r = {}
-          r['timestamp'] = m[1]
-          r['level'] = m[2]
-          msg = m[3]
+          r['level'] = m[1]
+          msg = m[2]
           r['message'] = msg
           if m = msg.match(/^(\S+?):(\d+) - (\d+) \"([^\"]*)\" (\S+) (\S+) (\d+) (\d+(?:\.\d+)?)s$/)
             r['remote_ip'] = m[1]
