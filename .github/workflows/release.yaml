@@ -5,7 +5,7 @@ on:
     branches:
       - master
     paths:
-      - 'lib/nais-log-parser/version.rb'
+      - 'lib/nais/log/parser/version.rb'
 
 jobs:
   release:
