@@ -19,10 +19,12 @@ jobs:
         uses: actions/setup-ruby@v1
         with:
           ruby-version: 2.6.x
-      - name: Install rspec
-        run: gem install rspec
+      - name: Install bundler
+        run: |
+          gem install bundler
+          bundle install
       - name: Run rspec
-        run: rspec
+        run: bundle exec rspec spec
       - name: Build gem
         run: gem build nais-log-parser.gemspec
       - name: Verify unreleased
