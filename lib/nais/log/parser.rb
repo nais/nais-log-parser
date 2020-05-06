@@ -202,7 +202,7 @@ module Nais
           record['stack_trace'] = record['exception']['stacktrace'] if record['exception'].has_key?('stacktrace')
           record.delete('exception')
         end
-        if record.has_key?('mdc')
+        if record.has_key?('mdc') && !record['mdc'].nil?
           record['mdc'].each{|k,v|
             record[k] = record['mdc'][k]
           }
