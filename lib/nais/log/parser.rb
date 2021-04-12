@@ -533,6 +533,32 @@ module Nais
         end
       end
 
+      def Parser.parse_jupyterhub_notebook(str)
+        if !str.nil? && m = str.match(/^\[(?<level>\w) (?<timestamp>(\d|-)+ (\d|\.|:)+) (?<component>\w+) (?<file>\w+):(?<line>\d+)\] (?<message>.*)$/)
+          record = m.names.zip(m.captures).to_h
+          record['level'] = loglevel_letter_to_word(m[:level])
+          record['timestamp'] = Time.strptime("#{m[:timestamp]}", "%Y-%m-%d %H:%M:%S").iso8601
+          record
+        else
+          return nil
+        end
+      end
+
+      def Parser.loglevel_letter_to_word(level)
+        case level
+        when 'D'
+          'Debug'
+        when 'I'
+          'Info'
+        when 'W'
+          'Warning'
+        when 'E'
+          'Error'
+        else
+          level
+        end
+      end
+
       def Parser.loglevel_from_dns_response(response)
         return case response
                when 'NOERROR'
