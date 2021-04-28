@@ -406,6 +406,24 @@ module Nais
         return r
       end
 
+      def Parser.parse_accesslog_nginx_ingress(str)
+        r,ext = Parser.parse_accesslog(str)
+        if !ext.nil? && m = ext.match(/^\s+\"(.+?)\" \"(.+?)\" (\S+) (\S+) \[(.*?)\] \[(.*?)\] (\S+) (\S+) (\S+) (\S+) (\S+)$/)
+          r['referer'] = m[1] unless m[1] == '-'
+          r['user_agent'] = m[2] unless m[2] == '-'
+          r['request_length'] = m[3] unless m[3] == '-'
+          r['request_time'] = m[4] unless m[4] == '-'
+          r['upstream_name'] = m[5] unless m[5].nil?
+          r['alternative_upstream_name'] = m[6] unless (m[6].nil? || m[6] == '')
+          r['upstream_address'] = m[7]
+          r['upstream_response_length'] = m[8] unless m[8] == '-'
+          r['upstream_response_time'] = m[9] unless m[9] == '-'
+          r['upstream_status'] = m[10] unless m[10] == '-'
+          r['request_id'] = m[11] unless m[11] == '-'
+        end
+        return r
+      end
+
       def Parser.parse_logrus(str)
         r = Logfmt.parse(str)
         if !r.nil? && r.has_key?('time') && r.has_key?('level') && r.has_key?('msg')

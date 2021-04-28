@@ -292,6 +292,25 @@ RSpec.describe Nais::Log::Parser do
               "user_agent" => "Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/58.0.3029.110 Safari/537.36"})
   end
 
+  it "does parse nginx ingress controller accesslog" do
+    expect(Nais::Log::Parser.parse_accesslog_nginx_ingress('127.0.0.1 - - [10/Oct/2000:13:55:36 -0700] "GET /apache_pb.gif HTTP/1.0" 200 2326 "-" "foobar" 126 0.019 [istio-system-gw-nais-io-443] [] 10.7.72.36:8443 0 0.019 304 364f3a5a8c0fd06ddf73d535bde1c8c6')).
+      to eql({"remote_ip"=>"127.0.0.1",
+              "timestamp"=>"2000-10-10T13:55:36-07:00",
+              "request"=>"GET /apache_pb.gif HTTP/1.0",
+              "response_code"=>"200",
+              "content_length"=>"2326",
+              "user_agent" => "foobar",
+              "request_id" => "364f3a5a8c0fd06ddf73d535bde1c8c6",
+              "request_length" => "126",
+              "request_time" => "0.019",
+              "upstream_address" => "10.7.72.36:8443",
+              "upstream_name" => "istio-system-gw-nais-io-443",
+              "upstream_response_length" => "0",
+              "upstream_response_time" => "0.019",
+              "upstream_status" => "304"
+             })
+  end
+
   it "does return nil on non-glog" do
     expect(Nais::Log::Parser.parse_glog('Lorem ipsum dolor sit amet, consectetur adipiscing elit.')).
       to be nil
