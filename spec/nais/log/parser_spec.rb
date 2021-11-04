@@ -540,6 +540,13 @@ RSpec.describe Nais::Log::Parser do
       to eql({'@timestamp'=>t.iso8601(9), 'unparsed_timestamp'=>'foo', 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
   end
 
+  it "does remap elasticsearch fields on record with numeric timestamp" do
+    t = Time.now
+    r = {"ts"=>t.to_f, "level"=>"Info", "log"=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit"}
+    expect(Nais::Log::Parser.remap_elasticsearch_fields(t, r).tap { |hs| hs.delete("received_at") }).
+      to eql({'@timestamp'=>t.iso8601(6), 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
+  end
+
   it "does jupyter logs parse" do
     logged = '[W 2021-03-16 16:05:29.163 SingleUserNotebookApp handlers:252] Replacing stale connection: ead00266-1e94-47e3-9fc3-f1f78c39f0e0:2087e0bf-2bc8-4e39-9cd5-7591b7fb8aa4'
     expect(Nais::Log::Parser.parse_jupyterhub_notebook(logged)).

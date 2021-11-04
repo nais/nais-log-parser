@@ -172,7 +172,13 @@ module Nais
           record["@timestamp"] = record.delete("timestamp") || record.delete("time") || record.delete("ts")
         end
         begin
-          record["@timestamp"] = Time.parse(record["@timestamp"]).iso8601(9) if record.has_key?("@timestamp") && !record["@timestamp"].nil?
+          if record.has_key?("@timestamp") && !record["@timestamp"].nil?
+            if record["@timestamp"].instance_of?(String)
+              record["@timestamp"] = Time.parse(record["@timestamp"]).iso8601(9)
+            else
+              record["@timestamp"] = Time.at(record["@timestamp"]).iso8601(6) # 6 decimals, double is not accurate enough for nanoseconds
+            end
+          end
         rescue ArgumentError
           record["unparsed_timestamp"] = record.delete("@timestamp") unless record["@timestamp"].nil?
         end
