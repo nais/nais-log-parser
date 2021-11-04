@@ -541,10 +541,10 @@ RSpec.describe Nais::Log::Parser do
   end
 
   it "does remap elasticsearch fields on record with numeric timestamp" do
-    t = Time.now
+    t = Time.at(1636007022.2)
     r = {"ts"=>t.to_f, "level"=>"Info", "log"=>"Lorem ipsum dolor sit amet, consectetur adipiscing elit"}
     expect(Nais::Log::Parser.remap_elasticsearch_fields(t, r).tap { |hs| hs.delete("received_at") }).
-      to eql({'@timestamp'=>t.iso8601(6), 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
+      to eql({'@timestamp'=>'2021-11-04T06:23:42.200000+00:00', 'level'=>'Info', 'message'=>'Lorem ipsum dolor sit amet, consectetur adipiscing elit'})
   end
 
   it "does jupyter logs parse" do
