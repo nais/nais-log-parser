@@ -433,9 +433,9 @@ RSpec.describe Nais::Log::Parser do
   end
 
   it "does merge json" do
-    r = {'log'=>"{\"message\":\"test\",\"foo\":\"bar\"}\n",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
+    r = {'log'=>"{\"message\":\"test\",\"foo\":\"bar\",\"array\": [\"a\", \"b\"], \"hash\": {\"a\": 1}}\n",'stream'=>'stdout','time'=>'2018-05-23T07:56:09.330928186Z'}
     expect(Nais::Log::Parser.merge_json_field(r, 'log')).
-      to eql({'stream'=>'stdout', 'foo'=>'bar', 'message'=>'test', 'time'=>'2018-05-23T07:56:09.330928186Z'})
+      to eql({'stream'=>'stdout', 'foo'=>'bar', 'array'=>['a', 'b'], 'hash'=>{'a'=>1}, 'message'=>'test', 'time'=>'2018-05-23T07:56:09.330928186Z'})
   end
 
   it "does return nil on non logrus" do
