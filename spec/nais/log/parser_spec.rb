@@ -29,6 +29,21 @@ RSpec.describe Nais::Log::Parser do
       to eql({"a"=>"b", "c_d"=>["e", "7"]})
   end
 
+  it "drop_nested_elements handles nil array" do
+    expect(Nais::Log::Parser.drop_nested_elements(nil)).
+      to eql(nil)
+  end
+
+  it "does not change one-level hash" do
+    expect(Nais::Log::Parser.drop_nested_elements({"a"=>"b", "c"=>"d", "e" => 7})).
+      to eql({"a"=>"b", "c" => "d", "e" => 7})
+  end
+
+  it "does drop nested elements in hash" do
+    expect(Nais::Log::Parser.drop_nested_elements({"a"=>"b", "c"=>{"d"=>["e", 7]}, "f" => 4, "g" => ["ga", "gb", 4]})).
+      to eql({"a"=>"b", "f" => 4})
+  end
+
   it "does not find exception" do
     expect(Nais::Log::Parser.get_keywords('Lorem ipsum dolor sit amet, consectetur adipiscing elit.', /\b[A-Z]\w+Exception\b/)).
       to be nil

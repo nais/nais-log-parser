@@ -32,6 +32,12 @@ module Nais
         end
       end
 
+      def Parser.drop_nested_elements(hash)
+        if !hash.nil? and hash.is_a?(Hash)
+          hash.delete_if {|k,v| (v.is_a?(Array) || v.is_a?(Hash))}
+        end
+      end
+
       def Parser.get_keywords(str, regex)
         keywords = str.scan(regex)
         if keywords.any?
