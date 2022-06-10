@@ -44,6 +44,10 @@ RSpec.describe Nais::Log::Parser do
       to eql({"a"=>"b", "f" => 4})
   end
 
+  it "rewrite_keys does replace . with _" do
+    expect(Nais::Log::Parser.rewrite_keys({"a"=>"a", "a_b"=>"bb", "a.c"=>"ccc"})).
+      to eql({"a"=>"a", "a_b"=>"bb", "a_c"=>"ccc"})
+  end
   it "does not find exception" do
     expect(Nais::Log::Parser.get_keywords('Lorem ipsum dolor sit amet, consectetur adipiscing elit.', /\b[A-Z]\w+Exception\b/)).
       to be nil

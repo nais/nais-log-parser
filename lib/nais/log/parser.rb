@@ -38,6 +38,12 @@ module Nais
         end
       end
 
+      def Parser.rewrite_keys(hash)
+        if !hash.nil? and hash.is_a?(Hash)
+          hash.transform_keys {|k| k.tr('.', '_')}
+        end
+      end
+
       def Parser.get_keywords(str, regex)
         keywords = str.scan(regex)
         if keywords.any?
