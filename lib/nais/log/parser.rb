@@ -32,9 +32,9 @@ module Nais
         end
       end
 
-      def Parser.drop_nested_elements(hash)
+      def Parser.drop_nested_elements(hash, keep = nil)
         if !hash.nil? and hash.is_a?(Hash)
-          hash.delete_if {|k,v| (v.is_a?(Array) || v.is_a?(Hash))}
+          hash.delete_if {|k,v| ((v.is_a?(Array) || v.is_a?(Hash))) && (keep.nil? || k !~ keep)}
         end
       end
 

@@ -44,6 +44,11 @@ RSpec.describe Nais::Log::Parser do
       to eql({"a"=>"b", "f" => 4})
   end
 
+  it "does keep whitelisted nested element in hash" do
+    expect(Nais::Log::Parser.drop_nested_elements({"a"=>"b", "c"=>{"d"=>["e", 7]}, "cc" => 4, "ccc" => ["ca", "cb", 4]}, /^c$/)).
+      to eql({"a"=>"b", "c"=>{"d"=>["e", 7]}, "cc" => 4})
+  end
+  
   it "rewrite_keys does replace . with _" do
     expect(Nais::Log::Parser.rewrite_keys({"a"=>"a", "a_b"=>"bb", "a.c"=>"ccc"})).
       to eql({"a"=>"a", "a_b"=>"bb", "a_c"=>"ccc"})
