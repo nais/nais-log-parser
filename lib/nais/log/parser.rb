@@ -616,7 +616,7 @@ module Nais
 
       def Parser.loglevel_from_http_response(response)
         return case response.to_s[0,1]
-               when '2','3'
+               when '1','2','3'
                  'Info'
                when '4'
                  'Warning'
