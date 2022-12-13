@@ -3,7 +3,7 @@ require "nais/log/parser/version"
 require "time"
 require "json"
 require "logfmt"
-require "uri"
+require "cgi"
 
 module Nais
   module Log
@@ -279,19 +279,19 @@ module Nais
         unless str.nil?
           i = str.index('?')
           if i.nil?
-            r['path'] = URI.decode(str)
+            r['path'] = CGI.unescape(str)
           else
             if i != 0
-              r['path'] = URI.decode(str[0,i])
+              r['path'] = CGI.unescape(str[0,i])
             end
             if i+1 < str.length
               query = str[i+1, str.length]
               kv = {}
               query.scan(/([^=&]+)=([^&]+)/) do |k,v|
                 k.gsub!(/\+/, ' ')
-                k = URI.decode(k)
+                k = CGI.unescape(k)
                 v.gsub!(/\+/, ' ')
-                v = URI.decode(v)
+                v = CGI.unescape(v)
                 if kv.has_key?(k)
                   if kv[k].is_a?(Array)
                     next if kv[k].include?(v)
